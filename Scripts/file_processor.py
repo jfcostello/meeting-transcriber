@@ -1,9 +1,9 @@
 import os
 import shutil
-from audio_extractor import extract_audio
-from transcriber import transcribe_audio
-from summarizer import summarize_transcript
-from config_handler import get_config
+from .audio_extractor import extract_audio
+from .transcriber import transcribe_audio
+from .summarizer import summarize_transcript
+from .config_handler import get_config
 
 def process_file(file_path):
     config = get_config()
@@ -16,21 +16,27 @@ def process_file(file_path):
         if file_ext in ['.mp4', '.avi', '.mov', '.mkv']:
             # Process video file
             audio_path = extract_audio(file_path, config['processed_audio_folder'])
-            transcript_path = transcribe_audio(audio_path, config['transcripts_folder'], config['whisper_model'], config['language'])
-            summary_path = summarize_transcript(transcript_path, config)
-            move_processed_file(file_path, config['processed_video_folder'])
-            print(f"Video processed: {file_name}")
-            print(f"Audio extracted: {os.path.basename(audio_path)}")
-            print(f"Transcript created: {os.path.basename(transcript_path)}")
-            print(f"Summary created: {os.path.basename(summary_path)}")
+            transcript_path = transcribe_audio(audio_path, config['transcripts_folder'], config['whisper'])
+            if transcript_path:
+                summary_path = summarize_transcript(transcript_path, config)
+                move_processed_file(file_path, config['processed_video_folder'])
+                print(f"Video processed: {file_name}")
+                print(f"Audio extracted: {os.path.basename(audio_path)}")
+                print(f"Transcript created: {os.path.basename(transcript_path)}")
+                print(f"Summary created: {os.path.basename(summary_path)}")
+            else:
+                print(f"Failed to transcribe: {file_name}")
         elif file_ext in ['.mp3', '.wav', '.m4a', '.flac']:
             # Process audio file
-            transcript_path = transcribe_audio(file_path, config['transcripts_folder'], config['whisper_model'], config['language'])
-            summary_path = summarize_transcript(transcript_path, config)
-            move_processed_file(file_path, config['processed_audio_folder'])
-            print(f"Audio processed: {file_name}")
-            print(f"Transcript created: {os.path.basename(transcript_path)}")
-            print(f"Summary created: {os.path.basename(summary_path)}")
+            transcript_path = transcribe_audio(file_path, config['transcripts_folder'], config['whisper'])
+            if transcript_path:
+                summary_path = summarize_transcript(transcript_path, config)
+                move_processed_file(file_path, config['processed_audio_folder'])
+                print(f"Audio processed: {file_name}")
+                print(f"Transcript created: {os.path.basename(transcript_path)}")
+                print(f"Summary created: {os.path.basename(summary_path)}")
+            else:
+                print(f"Failed to transcribe: {file_name}")
         else:
             print(f"Unsupported file type: {file_ext}")
     except Exception as e:

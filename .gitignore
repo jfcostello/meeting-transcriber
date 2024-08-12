@@ -1,0 +1,9 @@
+.env
+as-env/
+meeting_recording_queue/
+processed_video_files/
+processed_audio_files/
+transcripts/
+summaries/
+__pycache__/
+*.pyc

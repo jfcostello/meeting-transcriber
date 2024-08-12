@@ -1,29 +1,33 @@
 # Folder paths
-meeting_recordings_folder: "Meeting_Recordings"
-processed_video_folder: "Processed_Video_Files"
-processed_audio_folder: "Processed_Audio_Files"
-transcripts_folder: "Transcripts"
-summaries_folder: "Summaries"
+meeting_recordings_folder: "meeting_recording_queue"
+processed_video_folder: "processed_video_files"
+processed_audio_folder: "processed_audio_files"
+transcripts_folder: "transcripts"
+summaries_folder: "summaries"
 
 # Whisper settings
-whisper_model: "medium"
-language: "auto"  # Set to a specific language code or "auto" for automatic detection
+whisper:
+  model: "medium"
+  language: "auto"  # Set to a specific language code or "auto" for automatic detection
+  device: "cuda"    # Options: "auto", "cpu", "cuda"
+  batch_size: "auto"  # "auto" or an integer
+  use_fp16: "auto"    # "auto", true, or false
+  segment_length: "auto"  # "auto" or an integer (seconds)
 
 # LLM settings
 llm:
-  model: "gpt-3.5-turbo"
-  client_type: "togetherai"
-  system_prompt: "You are a helpful AI assistant tasked with summarizing transcripts."
-  max_tokens: 500
+  model: "claude-3-5-sonnet-20240620"
+  client_type: "anthropic"
+  max_tokens: 4000
   temperature: 0.7
 
-# Summary prompt to use (should match a key in the 'prompts' section)
-summary_prompt: "meeting"
+# Summary settings
+summary_type: "meeting"  # This should match a key in the 'system_prompts' section
 
-# Prompt templates
-prompts:
-  meeting: "Summarize the following meeting transcript, highlighting key points and action items:"
-  lecture: "Provide a concise summary of the following lecture, emphasizing main topics and key takeaways:"
-  interview: "Summarize the main points discussed in this interview, including any notable quotes or insights:"
+# System prompts (these act as the system prompt for the LLM)
+system_prompts:
+  meeting: "You are an AI assistant tasked with summarizing meeting transcripts. Summarize the following meeting transcript, highlighting key points and action items:"
+  lecture: "You are an AI assistant tasked with summarizing educational content. Provide a concise summary of the following lecture, emphasizing main topics and key takeaways:"
+  interview: "You are an AI assistant tasked with summarizing interviews. Summarize the main points discussed in this interview, including any notable quotes or insights:"
 
-# Add more configuration options as needed
+# Add more configuration options as neede
