@@ -17,11 +17,10 @@ whisper:
   segment_length: "auto"  # "auto" or an integer (seconds)
 
 llm:
-  model: "xtuner/llava-phi-3-mini-gguf"
-  client_type: "local_openai"
-  max_tokens: 6000
-  temperature: 0.7
-  base_url: "http://localhost:1234/v1" #only use this if using something like lm studio and local llms
+  model: "claude-3-5-sonnet-20240620"
+  client_type: anthropic
+  max_tokens: 4000
+  temperature: 0
 
 # Summary settings
 summary_type: "meeting"  # This should match a key in the 'system_prompts' section
