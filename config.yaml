@@ -1,0 +1,29 @@
+# Folder paths
+meeting_recordings_folder: "Meeting_Recordings"
+processed_video_folder: "Processed_Video_Files"
+processed_audio_folder: "Processed_Audio_Files"
+transcripts_folder: "Transcripts"
+summaries_folder: "Summaries"
+
+# Whisper settings
+whisper_model: "medium"
+language: "auto"  # Set to a specific language code or "auto" for automatic detection
+
+# LLM settings
+llm:
+  model: "gpt-3.5-turbo"
+  client_type: "togetherai"
+  system_prompt: "You are a helpful AI assistant tasked with summarizing transcripts."
+  max_tokens: 500
+  temperature: 0.7
+
+# Summary prompt to use (should match a key in the 'prompts' section)
+summary_prompt: "meeting"
+
+# Prompt templates
+prompts:
+  meeting: "Summarize the following meeting transcript, highlighting key points and action items:"
+  lecture: "Provide a concise summary of the following lecture, emphasizing main topics and key takeaways:"
+  interview: "Summarize the main points discussed in this interview, including any notable quotes or insights:"
+
+# Add more configuration options as needed
