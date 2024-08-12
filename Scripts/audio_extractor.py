@@ -5,10 +5,6 @@ def extract_audio(video_file_path, output_folder):
     file_name = os.path.splitext(os.path.basename(video_file_path))[0]
     output_path = os.path.join(output_folder, f"{file_name}.wav")
 
-    # Ensure output folder exists
-    os.makedirs(output_folder, exist_ok=True)
-
-    # Use ffmpeg to extract audio
     try:
         subprocess.run([
             "ffmpeg",

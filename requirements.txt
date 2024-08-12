@@ -2,9 +2,9 @@
 numpy-1.26.0 # needed right now to avoid conflicts
 python-dotenv
 
-# If you want to transcribe the meetings locally and have a decent GPU or equivilant (Like a modern mac)
+# If you want to transcribe the meetings locally
 git+https://github.com/openai/whisper.git 
-# If you want to transcribe the meetings locally and have a bit less power
+# If you want to transcribe the meetings locally with a bit less power, prioritizing speed
 faster-whisper
 
 # For summarization, if you're only going to use one of these, you can just install that specific one
@@ -13,3 +13,9 @@ replicate
 openai
 anthropic
 groq
+
+# for Nvidia GPU useage, you don't need it if you don't have a Nividia GPU
+--find-links https://download.pytorch.org/whl/cu118
+torch
+torchvision
+torchaudio

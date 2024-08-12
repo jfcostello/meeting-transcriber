@@ -6,4 +6,5 @@ processed_audio_files/
 transcripts/
 summaries/
 __pycache__/
-*.pyc
+*.pycgit push origin main --force
+summary_type_presets/

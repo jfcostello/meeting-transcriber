@@ -1,20 +1,26 @@
-from scripts.config_handler import load_config
-from scripts.file_processor import get_files_to_process, process_file
+import os
+from scripts.file_processor import process_videos, process_audio_files, process_transcripts
+from scripts.config_handler import get_config
 
 def main():
-    config = load_config()
-    files = get_files_to_process(config['meeting_recordings_folder'])
-    
-    print(f"Found {len(files)} files to process.")
-    
-    for file in files:
-        try:
-            process_file(file)
-            print(f"Processed: {file}")
-        except Exception as e:
-            print(f"Error processing {file}: {str(e)}")
-    
-    print("Processing complete. Check the Transcripts and Summaries folders for results.")
+    config = get_config()
+    queue_folder = config['meeting_recordings_folder']
+
+    print("Starting processing pipeline...")
+
+    # Process videos
+    print("\nProcessing videos...")
+    process_videos(queue_folder, config)
+
+    # Process audio files
+    print("\nProcessing audio files...")
+    process_audio_files(queue_folder, config)
+
+    # Process transcripts
+    print("\nProcessing transcripts...")
+    process_transcripts(queue_folder, config)
+
+    print("\nProcessing complete. Check the respective folders for results.")
 
 if __name__ == "__main__":
     main()

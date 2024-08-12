@@ -63,21 +63,19 @@ def transcribe_audio(audio_file_path, output_folder, config):
         segments = [audio[i:i+segment_length_samples] for i in range(0, len(audio), segment_length_samples)]
 
         full_transcript = []
-        for i in range(0, len(segments), batch_size):
-            print(f"Processing batch {i//batch_size + 1}/{(len(segments)-1)//batch_size + 1}")
-            batch = segments[i:i+batch_size]
-            mels = [log_mel_spectrogram(segment, device=device) for segment in batch]
-            
-            for j, mel in enumerate(mels):
-                result = whisper.decode(model, mel, options)
-                full_transcript.append(result.text)
+        for i, segment in enumerate(segments):
+            print(f"\nProcessing segment {i+1}/{len(segments)}")
+            mel = log_mel_spectrogram(segment, device=device)
+            result = whisper.decode(model, mel, options)
+            full_transcript.append(result.text)
+            print(result.text, flush=True)  # Print each segment as it's transcribed
 
         # Save transcript as markdown
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(f"# Transcript: {file_name}\n\n")
             f.write(" ".join(full_transcript))
 
-        print(f"Transcript saved: {output_path}")
+        print(f"\nTranscript saved: {output_path}")
         return output_path
     except Exception as e:
         print(f"Error processing {file_name}: {str(e)}")
