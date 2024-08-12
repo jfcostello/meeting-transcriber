@@ -13,6 +13,16 @@ from scripts.llm_utils import call_llm_api
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+def get_unique_filename(base_path):
+    directory, filename = os.path.split(base_path)
+    name, ext = os.path.splitext(filename)
+    counter = 1
+    new_path = base_path
+    while os.path.exists(new_path):
+        new_path = os.path.join(directory, f"{name}_{counter}{ext}")
+        counter += 1
+    return new_path
+
 def summarize_transcript(transcript_path, config):
     try:
         logger.info(f"Starting summarization for: {transcript_path}")
@@ -24,7 +34,8 @@ def summarize_transcript(transcript_path, config):
         if not output_folder:
             raise ValueError("'summaries_folder' not found in config")
         
-        output_path = os.path.join(output_folder, f"{file_name}_summary.md")
+        base_output_path = os.path.join(output_folder, f"{file_name}_summary.md")
+        output_path = get_unique_filename(base_output_path)
 
         # Ensure output folder exists
         os.makedirs(output_folder, exist_ok=True)
@@ -40,23 +51,24 @@ def summarize_transcript(transcript_path, config):
 
         try:
             summary_prompt = get_summary_prompt(config)
-            logger.debug(f"Summary prompt: {summary_prompt[:100]}...")  # Log first 100 chars
         except Exception as e:
             logger.error(f"Error getting summary prompt: {str(e)}")
             raise
 
-        # Prepare full prompt
-        full_prompt = f"{summary_prompt}\n\n{transcript}"
-
         # Call LLM API
+        logger.debug(f"LLM Config: {llm_config}")
+        logger.debug(f"Base URL from config: {llm_config.get('base_url')}")
+
         summary = call_llm_api(
             model=llm_config.get('model'),
-            content=transcript,  # Changed this from full_prompt to transcript
-            systemPrompt=summary_prompt,  # Use the cleaned summary_prompt as the system prompt
+            content=transcript,
+            systemPrompt=summary_prompt,
             max_tokens=llm_config.get('max_tokens'),
             temperature=llm_config.get('temperature'),
-            client_type=llm_config.get('client_type')
+            client_type=llm_config.get('client_type'),
+            base_url=llm_config.get('base_url')
         )
+        logger.debug(f"Call to LLM API completed")
 
         # Save summary as markdown
         with open(output_path, "w", encoding="utf-8") as f:

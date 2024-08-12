@@ -3,8 +3,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def call_llm_api(model, content, systemPrompt, max_tokens=4000, temperature=0, client_type="default"):
-    if client_type == "groq":
+def call_llm_api(model, content, systemPrompt, max_tokens=4000, temperature=0, client_type="default", base_url=None):
+    if client_type == "openai" or client_type == "local_openai":
+        from openai import OpenAI
+        if client_type == "openai":
+            api_key = os.getenv("OPENAI_API_KEY")
+        else:
+            api_key = os.getenv("LOCAL_LLM_API_KEY", "not-needed")
+        
+        client = OpenAI(api_key=api_key, base_url=base_url)
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": systemPrompt},
+                {"role": "user", "content": content}
+            ],
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+        response_content = response.choices[0].message.content
+        return response_content
+    elif client_type == "groq":
         from groq import Groq
         client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         chat_completion = client.chat.completions.create(
@@ -108,3 +127,4 @@ def call_llm_api(model, content, systemPrompt, max_tokens=4000, temperature=0, c
         return response_content
     else:
         raise ValueError(f"Unsupported client type: {client_type}")
+    

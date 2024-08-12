@@ -16,20 +16,12 @@ whisper:
   use_fp16: "auto"    # "auto", true, or false
   segment_length: "auto"  # "auto" or an integer (seconds)
 
-# LLM settings
 llm:
-  model: "claude-3-5-sonnet-20240620"
-  client_type: "anthropic"
-  max_tokens: 4000
+  model: "xtuner/llava-phi-3-mini-gguf"
+  client_type: "local_openai"
+  max_tokens: 6000
   temperature: 0.7
+  base_url: "http://localhost:1234/v1" #only use this if using something like lm studio and local llms
 
 # Summary settings
 summary_type: "meeting"  # This should match a key in the 'system_prompts' section
-
-# System prompts (these act as the system prompt for the LLM)
-system_prompts:
-  meeting: "You are an AI assistant tasked with summarizing meeting transcripts. Summarize the following meeting transcript, highlighting key points and action items:"
-  lecture: "You are an AI assistant tasked with summarizing educational content. Provide a concise summary of the following lecture, emphasizing main topics and key takeaways:"
-  interview: "You are an AI assistant tasked with summarizing interviews. Summarize the main points discussed in this interview, including any notable quotes or insights:"
-
-# Add more configuration options as neede
