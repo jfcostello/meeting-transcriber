@@ -68,14 +68,6 @@ The `config.yaml` file allows you to customize various aspects of the transcript
 - `use_fp16`: Whether to use FP16 precision. Options are "auto", true, or false.
 - `segment_length`: The length of audio segments to process. Set to "auto" or specify an integer (in seconds).
 
-# Meeting Transcriber
-
-[... previous content ...]
-
-## Configuration
-
-[... previous content ...]
-
 ### LLM Settings
 
 The LLM (Large Language Model) settings control how the summarization process works. These settings are crucial for determining which AI model will generate the summary and how it will behave.
