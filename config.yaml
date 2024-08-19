@@ -16,18 +16,12 @@ whisper:
   use_fp16: "auto"    # "auto", true, or false
   segment_length: "auto"  # "auto" or an integer (seconds)
 
+# You can use 'Anthropic' 'OpenAI' 'Groq' 'Gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models
 llm:
   model: "claude-3-5-sonnet-20240620"
   client_type: anthropic
   max_tokens: 4000
   temperature: 0
-
-#llm:
-#  model: "lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF"
-#  client_type: local_openai
-#  max_tokens: 4000
-#  temperature: 0
-#  base_url: "http://localhost:1234/v1"
 
 # Summary settings, give the name of the .txt file but without .txt, eg meetings.txt is "meetings"
 summary_type: "meeting" 

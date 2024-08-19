@@ -50,6 +50,14 @@ Meeting Transcriber is a Python-based tool that automates the process of transcr
 
 The `config.yaml` file allows you to customize various aspects of the transcription and summarization process. Here's a detailed breakdown of each configuration option:
 
+### Summary Settings
+
+- `summary_type`: In the folder summary_type_presents you'll find a couple of default pre set system prompts. To choose which system prompt to use, just put the name of the .txt file here without .txt. So for meeting.txt in /summary_type_presents/ use the value "meeting". 
+
+#### Summary Type Presets
+
+You can create custom summary types by adding `.txt` files to the `summary_type_presets_folder`. The content of these files will be used as the system prompt for the LLM when generating summaries. There is a default meetings one there already, and a 'custom' one used for ad-hoc one off requests. There's no limit to how many you can create, and feel free to modify any that are there. Just create a .txt file and when you want to select it add it to the summary_type in config.yaml
+
 ### Folder Paths
 
 - `meeting_recordings_folder`: The folder where input files are placed for processing.
@@ -165,14 +173,6 @@ To use a local model with LM Studio:
    ```
 
 Remember to ensure that you have the necessary API keys set in your `.env` file for the chosen `client_type`, except for `local_openai` which doesn't require an API key.
-
-### Summary Settings
-
-- `summary_type`: The type of summary to generate. This should match a key in the 'system_prompts' section or a filename in the `summary_type_presets_folder`.
-
-## Summary Type Presets
-
-You can create custom summary types by adding `.txt` files to the `summary_type_presets_folder`. The content of these files will be used as the system prompt for the LLM when generating summaries. There is a default meetings one there already, and a 'custom' one used for ad-hoc one off requests
 
 ## Supported File Types
 
