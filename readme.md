@@ -172,7 +172,7 @@ Remember to ensure that you have the necessary API keys set in your `.env` file 
 
 ## Summary Type Presets
 
-You can create custom summary types by adding `.txt` files to the `summary_type_presets_folder`. The content of these files will be used as the system prompt for the LLM when generating summaries.
+You can create custom summary types by adding `.txt` files to the `summary_type_presets_folder`. The content of these files will be used as the system prompt for the LLM when generating summaries. There is a default meetings one there already, and a 'custom' one used for ad-hoc one off requests
 
 ## Supported File Types
 

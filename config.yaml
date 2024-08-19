@@ -22,5 +22,12 @@ llm:
   max_tokens: 4000
   temperature: 0
 
-# Summary settings
-summary_type: "meeting"  # This should match a key in the 'system_prompts' section
+#llm:
+#  model: "lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF"
+#  client_type: local_openai
+#  max_tokens: 4000
+#  temperature: 0
+#  base_url: "http://localhost:1234/v1"
+
+# Summary settings, give the name of the .txt file but without .txt, eg meetings.txt is "meetings"
+summary_type: "meeting" 
