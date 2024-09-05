@@ -1,5 +1,6 @@
 .env
 as-env/
+venv/
 meeting_recording_queue/*
 !/meeting_recording_queue/
 !/meeting_recording_queue/.gitkeep

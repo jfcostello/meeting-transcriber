@@ -1,10 +1,10 @@
 # absolute requirements, no matter what path you take
-numpy-1.26.0 # needed right now to avoid conflicts
+numpy==1.26.0 # needed right now to avoid conflicts
 python-dotenv
 
-# If you want to transcribe the meetings locally
-git+https://github.com/openai/whisper.git 
-# If you want to transcribe the meetings locally with a bit less power, prioritizing speed
+##### If you want to transcribe the meetings locally use the following link (pip install can cause issues so recommend using
+# git+https://github.com/openai/whisper.git 
+# If you want to transcribe the meetings locally with a bit less power, prioritizing speed (Not supported yet but coming very soon)
 faster-whisper
 
 # For summarization, if you're only going to use one of these, you can just install that specific one
