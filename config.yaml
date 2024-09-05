@@ -10,7 +10,7 @@ summary_type_presets_folder: "summary_type_presets"
 # Whisper settings
 whisper:
   model: "medium"
-  language: "auto"  # Set to a specific language code or "auto" for automatic detection
+  language: "en"  # Set to a specific language code or "auto" for automatic detection
   device: "cuda"    # Options: "auto", "cpu", "cuda"
   batch_size: "auto"  # "auto" or an integer
   use_fp16: "auto"    # "auto", true, or false
@@ -18,8 +18,8 @@ whisper:
 
 # You can use 'Anthropic' 'OpenAI' 'Groq' 'Gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models
 llm:
-  model: "claude-3-5-sonnet-20240620"
-  client_type: anthropic
+  model: "gpt-4o-2024-08-06"
+  client_type: openai
   max_tokens: 4000
   temperature: 0
 
