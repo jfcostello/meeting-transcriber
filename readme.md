@@ -14,7 +14,7 @@ Meeting Transcriber is a Python-based tool that automates the process of transcr
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/meeting-transcriber.git
+   git clone https://github.com/jfcostello/meeting-transcriber.git
    cd meeting-transcriber
    ```
 
