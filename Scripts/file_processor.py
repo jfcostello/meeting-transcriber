@@ -52,7 +52,8 @@ def process_transcripts(queue_folder, config):
             new_filename = add_timestamp_to_filename(filename, config)
             old_path = os.path.join(queue_folder, filename)
             new_path = os.path.join(queue_folder, new_filename)
-            os.rename(old_path, new_path)
+            if old_path != new_path:
+                os.rename(old_path, new_path)
             
             try:
                 print(f"Processing transcript: {new_filename}")
