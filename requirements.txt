@@ -2,8 +2,8 @@
 numpy==1.26.0 # needed right now to avoid conflicts
 python-dotenv
 
-##### If you want to transcribe the meetings locally use the following link (pip install can cause issues so recommend using
-# git+https://github.com/openai/whisper.git 
+# If you want to transcribe the meetings locally and have a Nvidia GPU, install the following
+openai-whisper
 # If you want to transcribe the meetings locally with a bit less power, prioritizing speed (Not supported yet but coming very soon)
 faster-whisper
 

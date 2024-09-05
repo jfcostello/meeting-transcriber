@@ -57,3 +57,7 @@ def update_config(key, value):
     except Exception as e:
         logger.error(f"Error updating config: {str(e)}")
         raise
+
+def get_add_timestamp_config():
+    config = load_config()
+    return config.get('add_timestamp', False)

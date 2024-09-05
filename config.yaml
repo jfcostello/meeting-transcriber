@@ -25,3 +25,6 @@ llm:
 
 # Summary settings, give the name of the .txt file but without .txt, eg meetings.txt is "meetings"
 summary_type: "meeting" 
+
+# Add this line somewhere appropriate in the config file
+add_timestamp: true
