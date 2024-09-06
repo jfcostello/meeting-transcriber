@@ -6,8 +6,8 @@ import logging
 # Add the project root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from scripts.config_handler import get_summary_prompt, get_config
-from scripts.llm_utils import call_llm_api
+from Scripts.config_handler import get_summary_prompt, get_config
+from Scripts.llm_utils import call_llm_api
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
