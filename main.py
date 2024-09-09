@@ -1,6 +1,6 @@
 import os
-from scripts.file_processor import process_videos, process_audio_files, process_transcripts
-from scripts.config_handler import get_config
+from Scripts.file_processor import process_videos, process_audio_files, process_transcripts
+from Scripts.config_handler import get_config
 
 def main():
     config = get_config()
