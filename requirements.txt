@@ -1,13 +1,15 @@
 # absolute requirements, no matter what path you take
 numpy==1.26.0 # needed right now to avoid conflicts
 python-dotenv
+pyyaml
+ffmpeg-python
 
 # If you want to transcribe the meetings locally and have a Nvidia GPU, install the following
 openai-whisper
 # If you want to transcribe the meetings locally with a bit less power, prioritizing speed (Not supported yet but coming very soon)
 faster-whisper
 
-# For summarization, if you're only going to use one of these, you can just install that specific one
+# LLMs for summarization, if you're only going to use one of these, you can just install that specific one
 google-generativeai
 replicate
 openai
@@ -15,7 +17,8 @@ anthropic
 groq
 
 # for Nvidia GPU useage, you don't need it if you don't have a Nividia GPU
---find-links https://download.pytorch.org/whl/cu118
+# You may want to install a specific CUDA version depending on your GPU, for more info: https://pytorch.org/get-started/locally/
+--extra-index-url https://download.pytorch.org/whl/cu118
 torch
 torchvision
 torchaudio

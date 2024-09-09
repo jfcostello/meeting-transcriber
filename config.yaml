@@ -9,7 +9,7 @@ summary_type_presets_folder: "summary_type_presets"
 
 # Whisper settings
 whisper:
-  model: "medium"
+  model: "small"
   language: "en"  # Set to a specific language code or "auto" for automatic detection
   device: "cuda"    # Options: "auto", "cpu", "cuda"
   batch_size: "auto"  # "auto" or an integer
@@ -26,5 +26,5 @@ llm:
 # Summary settings, give the name of the .txt file but without .txt, eg meetings.txt is "meetings"
 summary_type: "meeting" 
 
-# Add this line somewhere appropriate in the config file
-add_timestamp: true
+# Do you want timestamps in the transcript? If you've no use for them set to false as it will increase your token cost on summarization
+add_timestamp: false
