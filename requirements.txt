@@ -2,7 +2,9 @@
 numpy==1.26.0 # needed right now to avoid conflicts
 python-dotenv
 pyyaml
-ffmpeg-python
+
+# to support whisper, must be installed seperately
+# ffmpeg
 
 # If you want to transcribe the meetings locally and have a Nvidia GPU, install the following
 openai-whisper

@@ -62,7 +62,7 @@ def call_llm_api(model, content, systemPrompt, max_tokens=4000, temperature=0, c
         generation_config = {
             "temperature": temperature,
             "top_p": 0.95,
-            "top_k": 64,
+            "top_k": 40,
             "max_output_tokens": max_tokens,
             "response_mime_type": "text/plain",
         }

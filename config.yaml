@@ -16,15 +16,15 @@ whisper:
   use_fp16: "auto"    # "auto", true, or false
   segment_length: "auto"  # "auto" or an integer (seconds)
 
-# You can use 'Anthropic' 'OpenAI' 'Groq' 'Gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models
+# You can use 'Anthropic' 'OpenAI' 'Groq' 'gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models
 llm:
-  model: "gpt-4o-2024-08-06"
-  client_type: openai
-  max_tokens: 4000
-  temperature: 0
+  model: "gemini-1.5-pro-002"
+  client_type: gemini
+  max_tokens: 8192
+  temperature: 0.2
 
 # Summary settings, give the name of the .txt file but without .txt, eg meetings.txt is "meetings"
 summary_type: "meeting" 
 
 # Do you want timestamps in the transcript? If you've no use for them set to false as it will increase your token cost on summarization
-add_timestamp: false
+add_timestamp: true
