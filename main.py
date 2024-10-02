@@ -1,3 +1,4 @@
+
 import os
 from Scripts.file_processor import process_videos, process_audio_files, process_transcripts
 from Scripts.config_handler import get_config

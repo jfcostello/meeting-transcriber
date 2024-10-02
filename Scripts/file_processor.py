@@ -1,9 +1,11 @@
+
 import os
 import shutil
 from datetime import datetime
 from .audio_extractor import extract_audio
-from .transcriber import transcribe_audio
+from .transcriber import transcribe_audio_flow
 from .summarizer import summarize_transcript
+from .config_handler import get_config
 
 def add_timestamp_to_filename(filename, config):
     if config.get('add_timestamp') == True:
@@ -40,7 +42,7 @@ def process_audio_files(queue_folder, config):
             
             try:
                 print(f"Processing audio: {new_filename}")
-                transcript_path = transcribe_audio(new_path, queue_folder, config['whisper'])
+                transcript_path = transcribe_audio_flow(new_path, queue_folder, config)
                 move_file(new_path, config['processed_audio_folder'])
                 print(f"Audio processed and moved: {new_filename}")
             except Exception as e:
