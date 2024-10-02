@@ -67,7 +67,13 @@ You can create custom summary types by adding `.txt` files to the `summary_type_
 - `summaries_folder`: The folder where generated summaries are saved.
 - `summary_type_presets_folder`: The folder containing summary type preset files.
 
-### Whisper Settings
+### Transcription Engine Settings
+
+- `transcription_engine`: The transcription engine to use. Options are "whisper" or "faster_whisper".
+
+Faster Whisper is a faster and more efficient version of Whisper, which may be more suitable for larger audio files if you don't have a GPU.
+
+#### Whisper Settings
 
 - `model`: The Whisper model to use for transcription. Options include "tiny", "base", "small", "medium", and "large".
 - `language`: The language of the audio. Set to "auto" for automatic detection or specify a language code.
@@ -75,6 +81,13 @@ You can create custom summary types by adding `.txt` files to the `summary_type_
 - `batch_size`: The batch size for processing. Set to "auto" or specify an integer.
 - `use_fp16`: Whether to use FP16 precision. Options are "auto", true, or false.
 - `segment_length`: The length of audio segments to process. Set to "auto" or specify an integer (in seconds).
+
+#### Faster Whisper Settings
+
+- `model`: The Faster Whisper model to use for transcription. Options include "tiny", "base", "small", "medium", and "large".
+- `device`: The device to use for processing. Options are "auto", "cpu", or "cuda".
+- `compute_type`: The compute type for processing. Options are "float16", "int8_float16", or "int8".
+- `beam_size`: The beam size for transcription.
 
 ### LLM Settings
 

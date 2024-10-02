@@ -1,4 +1,3 @@
-
 import os
 import logging
 from whisper.audio import SAMPLE_RATE, pad_or_trim
@@ -58,7 +57,7 @@ def transcribe_with_whisper(audio_file_path, output_folder, config):
             result = model.transcribe(segment, language=config.get('language', "auto"))
 
             full_transcript.append(result["text"])
-            logger.debug(result["text"])
+            logger.info(f"Segment {i+1} transcription: {result['text']}")  # Changed to info
 
         # Save transcript as markdown
         with open(output_path, "w", encoding="utf-8") as f:
@@ -88,7 +87,10 @@ def transcribe_with_faster_whisper(audio_file_path, output_folder, config):
 
         segments, info = model.transcribe(audio_file_path, beam_size=beam_size)
 
-        transcript_text = " ".join([segment.text for segment in segments])
+        transcript_text = ""
+        for i, segment in enumerate(segments):
+            logger.info(f"Segment {i+1} transcription: {segment.text}")
+            transcript_text += segment.text + " "
 
         # Save transcript as markdown
         with open(output_path, "w", encoding="utf-8") as f:

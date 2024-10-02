@@ -6,7 +6,7 @@ transcripts_folder: "transcripts"
 summaries_folder: "summaries"
 summary_type_presets_folder: "summary_type_presets"
 
-# You can use 'Anthropic' 'OpenAI' 'Groq' 'gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models
+# You can use 'Anthropic' 'OpenAI' 'Groq' 'gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models by setting client_type to local_openai
 llm:
   model: "gemini-1.5-pro-002"
   client_type: gemini
@@ -20,7 +20,7 @@ summary_type: "meeting"
 add_timestamp: true
 
 # Transcription Engine Configuration
-transcription_engine: "faster_whisper"  # Options: "whisper", "faster_whisper"
+transcription_engine: "whisper"  # Options: "whisper", "faster_whisper", faster_whisper can be useful for larger files and/or if you don't have a GPU
 
 # Whisper settings
 whisper:
@@ -33,7 +33,7 @@ whisper:
 
 # Faster Whisper Settings
 faster_whisper:
-  model: "medium.en"         # Specify the Faster Whisper model size
-  device: "cpu"           # Options: "cuda", "cpu"
-  compute_type: "auto"  # Options: "float16", "int8_float16", "int8"
-  beam_size: 5             # Beam size for transcription
+  model: "small.en"         # Specify the Faster Whisper model size
+  device: "auto"           # Options: "auto", "cpu", "cuda"
+  compute_type: "auto"  # Options: "auto" "float16", "int8_float16", "int8"
+  beam_size: 5             # Beam size for transcription, beam size of 5 is a good default. A higher beam size may improve accuracy but will be slower.
