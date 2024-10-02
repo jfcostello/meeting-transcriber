@@ -12,6 +12,31 @@ Meeting Transcriber is a Python-based tool that automates the process of transcr
 
 ## Installation
 
+### System Dependencies
+
+Before installing the Python packages, ensure you have the following system dependency:
+
+- ffmpeg: Required for audio/video processing
+
+#### Installing ffmpeg
+
+- On Ubuntu or Debian:
+  ```
+  sudo apt update && sudo apt install ffmpeg
+  ```
+
+- On macOS (using Homebrew):
+  ```
+  brew install ffmpeg
+  ```
+
+- On Windows (using Chocolatey):
+  ```
+  choco install ffmpeg
+  ```
+
+### Python Dependencies
+
 1. Clone the repository:
    ```
    git clone https://github.com/jfcostello/meeting-transcriber.git
@@ -23,12 +48,7 @@ Meeting Transcriber is a Python-based tool that automates the process of transcr
    pip install -r requirements.txt
    ```
 
-3. Install FFmpeg (required for audio extraction):
-   - On Ubuntu or Debian: `sudo apt update && sudo apt install ffmpeg`
-   - On macOS (using Homebrew): `brew install ffmpeg`
-   - On Windows (using Chocolatey): `choco install ffmpeg`
-
-4. Set up your environment variables in a `.env` file:
+3. Set up your environment variables in a `.env` file:
    ```
    OPENAI_API_KEY=your_openai_api_key
    ANTHROPIC_API_KEY=your_anthropic_api_key
