@@ -9,7 +9,7 @@ summary_type_presets_folder: "summary_type_presets"
 
 # Whisper settings
 whisper:
-  model: "small"
+  model: "turbo"
   language: "en"  # Set to a specific language code or "auto" for automatic detection
   device: "cuda"    # Options: "auto", "cpu", "cuda"
   batch_size: "auto"  # "auto" or an integer

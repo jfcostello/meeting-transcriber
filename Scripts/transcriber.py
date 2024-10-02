@@ -31,44 +31,28 @@ def transcribe_audio(audio_file_path, output_folder, config):
     # Load Whisper model
     model = whisper.load_model(config['model']).to(device)
 
-    # Determine batch size
-    if config['batch_size'] == "auto":
-        batch_size = 16 if device == "cuda" else 4
-    else:
-        batch_size = config['batch_size']
-
-    # Determine FP16 usage
-    use_fp16 = config['use_fp16']
-    if use_fp16 == "auto":
-        use_fp16 = device == "cuda"
-
-    # Determine segment length
-    if config['segment_length'] == "auto":
-        segment_length = 30  # Default to 30 seconds
-    else:
-        segment_length = config['segment_length']
-
-    # Set up options
-    options = whisper.DecodingOptions(
-        language=config['language'] if config['language'] != "auto" else None,
-        fp16=use_fp16 and device == "cuda"
-    )
-
     try:
         # Load audio
         audio = whisper.load_audio(audio_file_path)
         
+        # Define segment length (30 seconds)
+        segment_length = 30 * whisper.audio.SAMPLE_RATE
+
         # Process audio in segments
-        segment_length_samples = segment_length * SAMPLE_RATE
-        segments = [audio[i:i+segment_length_samples] for i in range(0, len(audio), segment_length_samples)]
+        segments = [audio[i:i+segment_length] for i in range(0, len(audio), segment_length)]
 
         full_transcript = []
         for i, segment in enumerate(segments):
             print(f"\nProcessing segment {i+1}/{len(segments)}")
-            mel = log_mel_spectrogram(segment, device=device)
-            result = whisper.decode(model, mel, options)
-            full_transcript.append(result.text)
-            print(result.text, flush=True)  # Print each segment as it's transcribed
+            
+            # Pad or trim the segment
+            segment = whisper.pad_or_trim(segment)
+            
+            # Transcribe the segment
+            result = model.transcribe(segment, language=config['language'] if config['language'] != "auto" else None)
+            
+            full_transcript.append(result["text"])
+            print(result["text"], flush=True)  # Print each segment as it's transcribed
 
         # Save transcript as markdown
         with open(output_path, "w", encoding="utf-8") as f:
@@ -80,11 +64,3 @@ def transcribe_audio(audio_file_path, output_folder, config):
     except Exception as e:
         print(f"Error processing {file_name}: {str(e)}")
         return None
-
-def log_mel_spectrogram(audio, device="cpu"):
-    """
-    Compute the log-Mel spectrogram of an audio signal.
-    """
-    audio = pad_or_trim(audio)
-    mel = whisper.log_mel_spectrogram(audio).to(device)
-    return mel
