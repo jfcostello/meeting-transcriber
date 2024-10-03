@@ -26,7 +26,7 @@ transcription_engine: "whisper"  # Options: "whisper", "faster_whisper", faster_
 whisper:
   model: "turbo"
   language: "en"  # Set to a specific language code or "auto" for automatic detection
-  device: "cpu"    # Options: "auto", "cpu", "cuda"
+  device: "auto"    # Options: "auto", "cpu", "cuda"
   batch_size: "auto"  # "auto" or an integer
   use_fp16: "auto"    # "auto", true, or false
   segment_length: "auto"  # "auto" or an integer (seconds)
