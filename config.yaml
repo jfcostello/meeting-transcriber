@@ -37,3 +37,4 @@ faster_whisper:
   device: "auto"           # Options: "auto", "cpu", "cuda"
   compute_type: "auto"  # Options: "auto" "float16", "int8_float16", "int8"
   beam_size: 5             # Beam size for transcription, beam size of 5 is a good default. A higher beam size may improve accuracy but will be slower.
+  trim_silence: "true"      # Trim silence from the audio file, useful to make transcriptions even faster
