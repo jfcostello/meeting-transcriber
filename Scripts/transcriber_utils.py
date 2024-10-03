@@ -61,7 +61,6 @@ def transcribe_with_whisper(audio_file_path, output_folder, config):
 
         # Save transcript as markdown
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write(f"# Transcript: {file_name}\n\n")
             f.write(" ".join(full_transcript))
 
         logger.info(f"Transcript saved: {output_path}")
@@ -94,7 +93,6 @@ def transcribe_with_faster_whisper(audio_file_path, output_folder, config):
 
         # Save transcript as markdown
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write(f"# Transcript: {file_name}\n\n")
             f.write(transcript_text)
 
         logger.info(f"Transcript saved: {output_path}")

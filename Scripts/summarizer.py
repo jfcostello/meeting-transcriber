@@ -72,7 +72,6 @@ def summarize_transcript(transcript_path, config):
 
         # Save summary as markdown
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write(f"# Summary: {file_name}\n\n")
             f.write(summary)
 
         logger.info(f"Summary saved: {output_path}")
