@@ -22,3 +22,4 @@ summary_type_presets/*
 !/summary_type_presets/custom.txt
 __pycache__/
 .codebuddy/
+.DS_Store
