@@ -81,14 +81,20 @@ def transcribe_with_faster_whisper(audio_file_path, output_folder, config):
         device = config.get('device', 'cuda')
         compute_type = config.get('compute_type', 'float16')
         beam_size = config.get('beam_size', 5)
+        
+        # New configuration option for VAD
+        trim_silence = config.get('trim_silence', False)
+        # Convert string "true" to boolean True, everything else to False
+        vad_filter = str(trim_silence).lower() == "true"
 
         model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
-        segments, info = model.transcribe(audio_file_path, beam_size=beam_size)
+        # Use the vad_filter parameter in the transcribe method
+        segments, info = model.transcribe(audio_file_path, beam_size=beam_size, vad_filter=vad_filter)
 
         transcript_text = ""
-        for i, segment in enumerate(segments):
-            logger.info(f"Segment {i+1} transcription: {segment.text}")
+        for segment in segments:
+            logger.info(f"Segment {segment.id}: {segment.text}")
             transcript_text += segment.text + " "
 
         # Save transcript as markdown
