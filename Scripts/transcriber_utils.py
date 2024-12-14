@@ -112,6 +112,7 @@ def transcribe_audio(audio_file_path, output_folder, config, summary_rules=None)
     Select and execute the appropriate transcription engine based on configuration.
     """
     engine = config.get('transcription_engine', 'whisper')
+    output_folder = os.path.dirname(audio_file_path)
     if engine == 'whisper':
         return transcribe_with_whisper(audio_file_path, output_folder, config.get('whisper', {}), summary_rules)
     elif engine == 'faster_whisper':

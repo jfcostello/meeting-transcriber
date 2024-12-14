@@ -34,7 +34,7 @@ def summarize_transcript(transcript_path, config):
             logger.debug(f"summarize_transcript: Config: {config}")
 
         file_name = os.path.splitext(os.path.basename(transcript_path))[0]
-        output_folder = config.get('summaries_folder')
+        output_folder = os.path.dirname(transcript_path)
         
         if not output_folder:
             raise ValueError("'summaries_folder' not found in config")
