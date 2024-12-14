@@ -25,7 +25,7 @@ def process_videos(queue_folder, config):
             try:
                 print(f"Processing video: {new_filename}")
                 audio_path = extract_audio(new_path, queue_folder)
-                move_file(new_path, config['processed_video_folder'])
+                move_file(new_path, config)
                 print(f"Video processed and moved: {new_filename}")
             except Exception as e:
                 print(f"Error processing video {new_filename}: {str(e)}")
@@ -55,7 +55,7 @@ def process_audio_files(queue_folder, config):
                                 summary_rules = f.read().strip()
 
                             transcript_path = transcribe_audio_flow(new_path, queue_folder, config, summary_rules)
-                            move_file(new_path, config['processed_audio_folder'])
+                            move_file(new_path, config)
                             print(f"Audio processed and moved: {new_filename}")
                         except Exception as e:
                             print(f"Error processing audio {new_filename}: {str(e)}")
@@ -81,7 +81,7 @@ def process_transcripts(queue_folder, config):
                         try:
                             print(f"Processing transcript: {new_filename}")
                             summary_path = summarize_transcript(new_path, config)
-                            move_file(new_path, config['transcripts_folder'])
+                            move_file(new_path, config)
                             print(f"Transcript processed and moved: {new_filename}")
                         except Exception as e:
                             print(f"Error processing transcript {new_filename}: {str(e)}")
@@ -89,16 +89,26 @@ def process_transcripts(queue_folder, config):
                 print(f"Warning: Skipping directory {item} as it does not contain a summary-rules.txt file.")
 
 
-def move_file(source_path, destination_folder):
+def move_file(source_path, config):
     filename = os.path.basename(source_path)
-    destination_path = os.path.join(destination_folder, filename)
+    output_folder = config.get('output_folder', '/output/')
     
-    # If file with same name exists, append a number
-    counter = 1
-    while os.path.exists(destination_path):
-        name, ext = os.path.splitext(filename)
-        destination_path = os.path.join(destination_folder, f"{name}_{counter}{ext}")
-        counter += 1
+    # Get today's date in YYYY-MM-DD format
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    
+    # Extract base filename without extension or suffixes
+    base_filename = filename
+    for suffix in ["_transcript", "_summary", "_transcript_summary"]:
+        if base_filename.endswith(suffix + ".md"):
+            base_filename = base_filename[:-len(suffix + ".md")]
+    base_filename = os.path.splitext(base_filename)[0]
+    
+    # Create the output directory structure
+    date_folder = os.path.join(output_folder, today_date)
+    file_folder = os.path.join(date_folder, base_filename)
+    os.makedirs(file_folder, exist_ok=True)
+    
+    destination_path = os.path.join(file_folder, filename)
 
     shutil.move(source_path, destination_path)
     print(f"Moved file to: {destination_path}")
