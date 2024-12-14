@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Scripts.config_handler import get_config
 from Scripts.llm_utils import call_llm_api
-from Scripts.file_processor import move_file
+from .utils import move_file
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
