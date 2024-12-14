@@ -1,5 +1,5 @@
 # Folder paths
-meeting_recordings_folder: "meeting_recording_queue"
+meeting_recordings_folder: "meeting_recording_queue/Easy_Voice_Recorder"
 processed_video_folder: "processed_video_files"
 processed_audio_folder: "processed_audio_files"
 transcripts_folder: "transcripts"
@@ -12,9 +12,6 @@ llm:
   client_type: gemini
   max_tokens: 8192
   temperature: 0.2
-
-# Summary settings, give the name of the .txt file but without .txt, eg meetings.txt is "meetings"
-summary_type: "meeting" 
 
 # Setting to modify the name of the file after it processes it to add a timestamp which can keep your outpout folders organized
 add_timestamp: true

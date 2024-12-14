@@ -1,4 +1,3 @@
-
 import os
 import logging
 from .transcriber_utils import transcribe_audio
@@ -7,13 +6,13 @@ from .transcriber_utils import transcribe_audio
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def transcribe_audio_flow(audio_file_path, output_folder, config):
+def transcribe_audio_flow(audio_file_path, output_folder, config, summary_rules=None):
     """
     Orchestrates the transcription process using the selected engine.
     """
     try:
         logger.info(f"Starting transcription for: {audio_file_path}")
-        transcript_path = transcribe_audio(audio_file_path, output_folder, config)
+        transcript_path = transcribe_audio(audio_file_path, output_folder, config, summary_rules)
         if transcript_path:
             logger.info(f"Transcription successful: {transcript_path}")
             return transcript_path

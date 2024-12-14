@@ -1,4 +1,3 @@
-
 import os
 import shutil
 from datetime import datetime
@@ -33,20 +32,36 @@ def process_videos(queue_folder, config):
 
 def process_audio_files(queue_folder, config):
     audio_extensions = ['.mp3', '.wav', '.m4a', '.flac']
-    for filename in os.listdir(queue_folder):
-        if any(filename.lower().endswith(ext) for ext in audio_extensions):
-            new_filename = add_timestamp_to_filename(filename, config)
-            old_path = os.path.join(queue_folder, filename)
-            new_path = os.path.join(queue_folder, new_filename)
-            os.rename(old_path, new_path)
-            
-            try:
-                print(f"Processing audio: {new_filename}")
-                transcript_path = transcribe_audio_flow(new_path, queue_folder, config)
-                move_file(new_path, config['processed_audio_folder'])
-                print(f"Audio processed and moved: {new_filename}")
-            except Exception as e:
-                print(f"Error processing audio {new_filename}: {str(e)}")
+    
+    for item in os.listdir(queue_folder):
+        item_path = os.path.join(queue_folder, item)
+        if os.path.isdir(item_path):
+            # Check if the subdirectory contains a summary-rules.txt file
+            summary_rules_path = os.path.join(item_path, "summary-rules.txt")
+            if os.path.exists(summary_rules_path):
+                # Process audio files in this subdirectory
+                for filename in os.listdir(item_path):
+                    if any(filename.lower().endswith(ext) for ext in audio_extensions):
+                        new_filename = add_timestamp_to_filename(filename, config)
+                        old_path = os.path.join(item_path, filename)
+                        new_path = os.path.join(item_path, new_filename)
+                        os.rename(old_path, new_path)
+                        
+                        try:
+                            print(f"Processing audio: {new_filename}")
+                            
+                            # Read the summary rules from the file
+                            with open(summary_rules_path, 'r') as f:
+                                summary_rules = f.read().strip()
+
+                            transcript_path = transcribe_audio_flow(new_path, queue_folder, config, summary_rules)
+                            move_file(new_path, config['processed_audio_folder'])
+                            print(f"Audio processed and moved: {new_filename}")
+                        except Exception as e:
+                            print(f"Error processing audio {new_filename}: {str(e)}")
+            else:
+                print(f"Warning: Skipping directory {item} as it does not contain a summary-rules.txt file.")
+        
 
 def process_transcripts(queue_folder, config):
     for filename in os.listdir(queue_folder):
