@@ -6,7 +6,7 @@ import logging
 # Add the project root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from Scripts.config_handler import get_summary_prompt, get_config
+from Scripts.config_handler import get_config
 from Scripts.llm_utils import call_llm_api
 
 # Set up logging
@@ -44,16 +44,25 @@ def summarize_transcript(transcript_path, config):
         with open(transcript_path, "r", encoding="utf-8") as f:
             transcript = f.read()
 
-        # Get LLM configuration and summary prompt
+        # Get LLM configuration
         llm_config = config.get('llm')
         if not llm_config:
             raise ValueError("'llm' configuration not found in config")
 
-        try:
-            summary_prompt = get_summary_prompt(config)
-        except Exception as e:
-            logger.error(f"Error getting summary prompt: {str(e)}")
-            raise
+        # Get the directory of the transcript file
+        transcript_dir = os.path.dirname(transcript_path)
+        
+        # Construct the path to the summary-rules.txt file
+        summary_rules_path = os.path.join(transcript_dir, "summary-rules.txt")
+        
+        # Read the summary rules from the file
+        if os.path.exists(summary_rules_path):
+            with open(summary_rules_path, 'r') as f:
+                summary_rules = f.read().strip()
+        else:
+            summary_rules = None
+            print(f"Warning: No summary-rules.txt found in {transcript_dir}. Using default settings.")
+
 
         # Call LLM API
         logger.debug(f"LLM Config: {llm_config}")
@@ -62,7 +71,7 @@ def summarize_transcript(transcript_path, config):
         summary = call_llm_api(
             model=llm_config.get('model'),
             content=transcript,
-            systemPrompt=summary_prompt,
+            systemPrompt=summary_rules,
             max_tokens=llm_config.get('max_tokens'),
             temperature=llm_config.get('temperature'),
             client_type=llm_config.get('client_type'),

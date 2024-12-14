@@ -23,3 +23,4 @@ summary_type_presets/*
 __pycache__/
 .codebuddy/
 .DS_Store
+.history/
