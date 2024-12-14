@@ -24,9 +24,14 @@ def get_unique_filename(base_path):
     return new_path
 
 def summarize_transcript(transcript_path, config):
+    log_enabled = get_config().get('logging', {}).get('enabled', False)
+    if log_enabled:
+        logger.info(f"summarize_transcript: Starting summarization for: {transcript_path}")
+        logger.info(f"summarize_transcript: Loaded config: {config}")
+        logger.info(f"summarize_transcript: Using LLM model: {config.get('llm', {}).get('model')}")
     try:
-        logger.info(f"Starting summarization for: {transcript_path}")
-        logger.debug(f"Config: {config}")
+        if log_enabled:
+            logger.debug(f"summarize_transcript: Config: {config}")
 
         file_name = os.path.splitext(os.path.basename(transcript_path))[0]
         output_folder = config.get('summaries_folder')
@@ -65,8 +70,9 @@ def summarize_transcript(transcript_path, config):
 
 
         # Call LLM API
-        logger.debug(f"LLM Config: {llm_config}")
-        logger.debug(f"Base URL from config: {llm_config.get('base_url')}")
+        if log_enabled:
+            logger.debug(f"summarize_transcript: LLM Config: {llm_config}")
+            logger.debug(f"summarize_transcript: Base URL from config: {llm_config.get('base_url')}")
 
         summary = call_llm_api(
             model=llm_config.get('model'),
@@ -77,13 +83,15 @@ def summarize_transcript(transcript_path, config):
             client_type=llm_config.get('client_type'),
             base_url=llm_config.get('base_url')
         )
-        logger.debug(f"Call to LLM API completed")
+        if log_enabled:
+            logger.debug(f"summarize_transcript: Call to LLM API completed")
 
         # Save summary as markdown
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(summary)
 
-        logger.info(f"Summary saved: {output_path}")
+        if log_enabled:
+            logger.info(f"summarize_transcript: Summary saved: {output_path}")
         return output_path
 
     except Exception as e:

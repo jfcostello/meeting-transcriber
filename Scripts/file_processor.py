@@ -61,24 +61,33 @@ def process_audio_files(queue_folder, config):
                             print(f"Error processing audio {new_filename}: {str(e)}")
             else:
                 print(f"Warning: Skipping directory {item} as it does not contain a summary-rules.txt file.")
-        
-
+                
 def process_transcripts(queue_folder, config):
-    for filename in os.listdir(queue_folder):
-        if filename.endswith('_transcript.md'):
-            new_filename = add_timestamp_to_filename(filename, config)
-            old_path = os.path.join(queue_folder, filename)
-            new_path = os.path.join(queue_folder, new_filename)
-            if old_path != new_path:
-                os.rename(old_path, new_path)
-            
-            try:
-                print(f"Processing transcript: {new_filename}")
-                summary_path = summarize_transcript(new_path, config)
-                move_file(new_path, config['transcripts_folder'])
-                print(f"Transcript processed and moved: {new_filename}")
-            except Exception as e:
-                print(f"Error processing transcript {new_filename}: {str(e)}")
+    for item in os.listdir(queue_folder):
+        item_path = os.path.join(queue_folder, item)
+        if os.path.isdir(item_path):
+            # Check if the subdirectory contains a summary-rules.txt file
+            summary_rules_path = os.path.join(item_path, "summary-rules.txt")
+            if os.path.exists(summary_rules_path):
+                # Process transcript files in this subdirectory
+                for filename in os.listdir(item_path):
+                    if filename.endswith('_transcript.md'):
+                        new_filename = add_timestamp_to_filename(filename, config)
+                        old_path = os.path.join(item_path, filename)
+                        new_path = os.path.join(item_path, new_filename)
+                        if old_path != new_path:
+                            os.rename(old_path, new_path)
+                        
+                        try:
+                            print(f"Processing transcript: {new_filename}")
+                            summary_path = summarize_transcript(new_path, config)
+                            move_file(new_path, config['transcripts_folder'])
+                            print(f"Transcript processed and moved: {new_filename}")
+                        except Exception as e:
+                            print(f"Error processing transcript {new_filename}: {str(e)}")
+            else:
+                print(f"Warning: Skipping directory {item} as it does not contain a summary-rules.txt file.")
+
 
 def move_file(source_path, destination_folder):
     filename = os.path.basename(source_path)
