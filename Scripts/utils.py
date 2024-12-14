@@ -11,7 +11,8 @@ def move_file(source_path, config):
     
     # Extract base filename without extension or suffixes
     base_filename = filename
-    for suffix in ["_transcript", "_summary", "_transcript_summary"]:
+    suffixes = ["_transcript_summary", "_transcript", "_summary"]
+    for suffix in suffixes:
         if base_filename.endswith(suffix + ".md"):
             base_filename = base_filename[:-len(suffix + ".md")]
     base_filename = os.path.splitext(base_filename)[0]
