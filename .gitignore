@@ -3,7 +3,8 @@ as-env/
 venv/
 meeting_recording_queue/*
 !/meeting_recording_queue/
-!/meeting_recording_queue/.gitkeep
+!/meeting_recording_queue/meeting
+!/meeting_recording_queue/ad-hoc
 processed_video_files/*
 !/processed_video_files/
 !/processed_video_files/.gitkeep
