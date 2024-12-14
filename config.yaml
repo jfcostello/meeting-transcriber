@@ -1,10 +1,6 @@
 # Folder paths
 meeting_recordings_folder: "meeting_recording_queue/Easy_Voice_Recorder"
-processed_video_folder: "processed_video_files"
-processed_audio_folder: "processed_audio_files"
-transcripts_folder: "transcripts"
-summaries_folder: "summaries"
-summary_type_presets_folder: "summary_type_presets"
+output_folder: "summaries"
 
 logging:
   enabled: true
