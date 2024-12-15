@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 def load_config():
     config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Config file not found: {config_path}")
     try:
         with open(config_path, 'r') as file:
             config = yaml.safe_load(file)
@@ -48,6 +50,8 @@ def get_summary_prompt(config):
 
 def update_config(key, value):
     config = load_config()
+    if key not in config:
+        raise KeyError(f"Key '{key}' not found in config")
     config[key] = value
     config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
     try:
