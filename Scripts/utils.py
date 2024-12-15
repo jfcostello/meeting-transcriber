@@ -17,9 +17,12 @@ def move_file(source_path, config):
             base_filename = base_filename[:-len(suffix + ".md")]
     base_filename = os.path.splitext(base_filename)[0]
     
+    # Extract parent directory name
+    parent_dir = os.path.basename(os.path.dirname(source_path))
+    
     # Create the output directory structure
     date_folder = os.path.join(output_folder, today_date)
-    file_folder = os.path.join(date_folder, base_filename)
+    file_folder = os.path.join(date_folder, parent_dir, base_filename)
     os.makedirs(file_folder, exist_ok=True)
     
     destination_path = os.path.join(file_folder, filename)
