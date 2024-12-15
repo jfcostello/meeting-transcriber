@@ -12,6 +12,8 @@ class TestAudioExtractor(unittest.TestCase):
             "ffmpeg",
             "-f", "lavfi",
             "-i", "testsrc=duration=1:size=640x480:rate=30",
+            "-f", "lavfi",
+            "-i", "sine=frequency=440:duration=1",
             "-vcodec", "libx264",
             "-acodec", "aac",
             "-pix_fmt", "yuv420p",
