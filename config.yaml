@@ -1,7 +1,14 @@
-# Folder paths
+# Input folder, the one where your video and audio files are placed that you wish to be transcribed and summarized
 meeting_recordings_folder: "meeting_recording_queue/Easy_Voice_Recorder"
-output_folder: "summaries"
 
+# Output folder configuration, where you want the final output and original files to be saved
+# Base folder is he primary directory where summaries will be saved and copies of the original files will be placed
+# Structure is an optional list of sub directories which will be created within the base folder. Date is date in YYYY-MM-DD format, file-name is the name of the original file, and summary-type is the folder the file was originally placed in. You can choose none, some or all and put them in any order. If none, everything will be saved in the base folder.
+output_structure:
+  base_folder: "summaries" 
+  structure: ["DATE", "SUMMARY-TYPE", "FILE-NAME"]  # Options: DATE, FILE-NAME, SUMMARY-TYPE, placed in quotation marks, seperated by commas
+
+# Enables additional console logging, set to 'true' to enable
 logging:
   enabled: true
 
@@ -16,9 +23,9 @@ llm:
 add_timestamp: false
 
 # Transcription Engine Configuration
-transcription_engine: "whisper"  # Options: "whisper", "faster_whisper", faster_whisper can be useful for larger files and/or if you don't have a GPU
+transcription_engine: "faster_whisper"  # Options: "whisper", "faster_whisper", faster_whisper can be useful for larger files and/or if you don't have a GPU
 
-# Whisper settings
+# Whisper settings, if you're using Whisoer
 whisper:
   model: "turbo"
   language: "en"  # Set to a specific language code or "auto" for automatic detection
@@ -27,10 +34,11 @@ whisper:
   use_fp16: "auto"    # "auto", true, or false
   segment_length: "auto"  # "auto" or an integer (seconds)
 
-# Faster Whisper Settings
+# Faster Whisper Settings, if you're susing faster_whisper
 faster_whisper:
   model: "small.en"         # Specify the Faster Whisper model size
   device: "auto"           # Options: "auto", "cpu", "cuda"
   compute_type: "auto"  # Options: "auto" "float16", "int8_float16", "int8"
   beam_size: 5             # Beam size for transcription, beam size of 5 is a good default. A higher beam size may improve accuracy but will be slower.
   trim_silence: "true"      # Trim silence from the audio file, useful to make transcriptions even faster
+
