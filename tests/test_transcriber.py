@@ -26,8 +26,14 @@ class TestTranscriber(unittest.TestCase):
 
     @patch('Scripts.transcriber.transcribe_audio')
     def test_transcribe_audio_flow_successful(self, mock_transcribe_audio):
-        # BDD: Scenario: Successful processing of an audio file - Then the audio file is transcribed
-        # Test: Checks if the transcription flow is executed successfully
+        # BDD:
+        #   Scenario: Successful audio transcription flow
+        #     Given an audio file and a config
+        #     When the transcribe_audio_flow function is called
+        #     Then the audio file should be transcribed
+        #     And the function should return the path to the transcript file
+        # Pass Criteria:
+        #   The audio file is transcribed, and the function returns the path to the transcript file.
         mock_transcribe_audio.return_value = os.path.join(self.test_audio_folder, "test_audio_transcript.md")
         config = self.test_config.copy()
         transcript_path = transcribe_audio_flow(self.test_audio_file, self.test_audio_folder, config)
@@ -36,8 +42,13 @@ class TestTranscriber(unittest.TestCase):
 
     @patch('Scripts.transcriber.transcribe_audio')
     def test_transcribe_audio_flow_error(self, mock_transcribe_audio):
-        # BDD: Scenario: Processing an audio file with an error during transcription - Then an error message is logged
-        # Test: Checks if an error is handled correctly during transcription
+        # BDD:
+        #   Scenario: Error during audio transcription flow
+        #     Given an audio file and a config
+        #     When the transcribe_audio_flow function is called and an error occurs
+        #     Then the function should raise an exception
+        # Pass Criteria:
+        #   The function raises an exception when an error occurs during transcription.
         mock_transcribe_audio.side_effect = Exception("Transcription error")
         config = self.test_config.copy()
         with self.assertRaises(Exception):

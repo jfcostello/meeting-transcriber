@@ -43,8 +43,13 @@ class TestFileProcessor(unittest.TestCase):
         shutil.rmtree(self.test_output_folder)
 
     def test_add_timestamp_to_filename_enabled(self):
-        # BDD: Scenario: Processing a video file with timestamping enabled - Then the video file is renamed with a timestamp
-        # Test: Checks if the filename is correctly timestamped when timestamping is enabled
+        # BDD:
+        #   Scenario: Add timestamp to filename (enabled)
+        #     Given a filename and a config with timestamping enabled
+        #     When the add_timestamp_to_filename function is called
+        #     Then the function should return the filename with a timestamp prefix
+        # Pass Criteria:
+        #   The function returns the filename with a timestamp prefix.
         config = self.test_config.copy()
         config['add_timestamp'] = True
         filename = "test_file.mp4"
@@ -53,16 +58,30 @@ class TestFileProcessor(unittest.TestCase):
         self.assertTrue(timestamped_filename.endswith(filename))
 
     def test_add_timestamp_to_filename_disabled(self):
-        # BDD: Scenario: Processing a video file with timestamping disabled - Then the video file is not renamed with a timestamp
-        # Test: Checks if the filename is not timestamped when timestamping is disabled
+        # BDD:
+        #   Scenario: Add timestamp to filename (disabled)
+        #     Given a filename and a config with timestamping disabled
+        #     When the add_timestamp_to_filename function is called
+        #     Then the function should return the original filename
+        # Pass Criteria:
+        #   The function returns the original filename without a timestamp prefix.
         config = self.test_config.copy()
         filename = "test_file.mp4"
         timestamped_filename = add_timestamp_to_filename(filename, config)
         self.assertEqual(timestamped_filename, filename)
 
     def test_process_videos_successful(self):
-        # BDD: Scenario: Successful processing of a video file - Then the audio is extracted, the video file is moved to the output folder, the audio file is transcribed, the transcript is summarized, and the summary is saved in the output folder
-        # Test: Checks if a video file is processed successfully
+        # BDD:
+        #   Scenario: Successful processing of a video file
+        #     Given a video file in the queue folder
+        #     When the process_videos function is called
+        #     Then the audio should be extracted
+        #     And the video file should be moved to the output folder
+        #     And the audio file should be transcribed
+        #     And the transcript should be summarized
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The video file, audio file, transcript, and summary are created in the output folder.
         config = self.test_config.copy()
         process_videos(self.test_queue_folder, config)
         self.assertTrue(os.path.exists(os.path.join(self.test_output_folder, "test_video.mp4")))
@@ -71,8 +90,13 @@ class TestFileProcessor(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.test_output_folder, "test_video_summary.md")))
 
     def test_process_videos_error(self):
-        # BDD: Scenario: Processing a video file with an error during audio extraction - Then an error message is logged and the video file is moved to the output folder
-        # Test: Checks if an error is handled correctly during video processing
+        # BDD:
+        #   Scenario: Error during video processing
+        #     Given a video file in the queue folder
+        #     When the process_videos function is called and an error occurs during audio extraction
+        #     Then the video file should be moved to the output folder
+        # Pass Criteria:
+        #   The video file is moved to the output folder even if an error occurs during audio extraction.
         config = self.test_config.copy()
         os.remove(self.test_video_file)
         with open(self.test_video_file, "w") as f:
@@ -81,8 +105,16 @@ class TestFileProcessor(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.test_output_folder, "test_video.mp4")))
 
     def test_process_audio_files_successful(self):
-        # BDD: Scenario: Successful processing of an audio file - Then the audio file is transcribed, the transcript is summarized, the audio file is moved to the output folder, and the summary is saved in the output folder
-        # Test: Checks if an audio file is processed successfully
+        # BDD:
+        #   Scenario: Successful processing of an audio file
+        #     Given an audio file in the queue folder
+        #     When the process_audio_files function is called
+        #     Then the audio file should be transcribed
+        #     And the transcript should be summarized
+        #     And the audio file should be moved to the output folder
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The audio file, transcript, and summary are created in the output folder.
         config = self.test_config.copy()
         os.makedirs(os.path.join(self.test_queue_folder, "test_audio_dir"), exist_ok=True)
         shutil.move(self.test_audio_file, os.path.join(self.test_queue_folder, "test_audio_dir", "test_audio.mp3"))
@@ -93,8 +125,17 @@ class TestFileProcessor(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.test_output_folder, "test_audio_dir", "test_audio_summary.md")))
 
     def test_process_audio_files_no_summary_rules(self):
-        # BDD: Scenario: Processing an audio file without a summary-rules.txt file - Then a warning message is logged, the audio file is transcribed, the transcript is summarized using default settings, the audio file is moved to the output folder, and the summary is saved in the output folder
-        # Test: Checks if an audio file is processed correctly when no summary rules are provided
+        # BDD:
+        #   Scenario: Processing an audio file without summary rules
+        #     Given an audio file in the queue folder without a summary-rules.txt file
+        #     When the process_audio_files function is called
+        #     Then a warning message should be logged
+        #     And the audio file should be transcribed
+        #     And the transcript should be summarized using default settings
+        #     And the audio file should be moved to the output folder
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The audio file, transcript, and summary are created in the output folder, and a warning message is logged.
         config = self.test_config.copy()
         os.makedirs(os.path.join(self.test_queue_folder, "test_audio_dir"), exist_ok=True)
         shutil.move(self.test_audio_file, os.path.join(self.test_queue_folder, "test_audio_dir", "test_audio.mp3"))
@@ -104,8 +145,15 @@ class TestFileProcessor(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.test_output_folder, "test_audio_dir", "test_audio_summary.md")))
 
     def test_process_transcripts_successful(self):
-        # BDD: Scenario: Successful processing of a transcript file - Then the transcript is summarized, the transcript file is moved to the output folder, and the summary is saved in the output folder
-        # Test: Checks if a transcript file is processed successfully
+        # BDD:
+        #   Scenario: Successful processing of a transcript file
+        #     Given a transcript file in the queue folder
+        #     When the process_transcripts function is called
+        #     Then the transcript should be summarized
+        #     And the transcript file should be moved to the output folder
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The transcript file and summary are created in the output folder.
         config = self.test_config.copy()
         os.makedirs(os.path.join(self.test_queue_folder, "test_transcript_dir"), exist_ok=True)
         shutil.move(self.test_transcript_file, os.path.join(self.test_queue_folder, "test_transcript_dir", "test_transcript_transcript.md"))
@@ -115,8 +163,16 @@ class TestFileProcessor(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.test_output_folder, "test_transcript_dir", "test_transcript_summary.md")))
 
     def test_process_transcripts_no_summary_rules(self):
-        # BDD: Scenario: Processing a transcript file without a summary-rules.txt file - Then a warning message is logged, the transcript is summarized using default settings, the transcript file is moved to the output folder, and the summary is saved in the output folder
-        # Test: Checks if a transcript file is processed correctly when no summary rules are provided
+        # BDD:
+        #   Scenario: Processing a transcript file without summary rules
+        #     Given a transcript file in the queue folder without a summary-rules.txt file
+        #     When the process_transcripts function is called
+        #     Then a warning message should be logged
+        #     And the transcript should be summarized using default settings
+        #     And the transcript file should be moved to the output folder
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The transcript file and summary are created in the output folder, and a warning message is logged.
         config = self.test_config.copy()
         os.makedirs(os.path.join(self.test_queue_folder, "test_transcript_dir"), exist_ok=True)
         shutil.move(self.test_transcript_file, os.path.join(self.test_queue_folder, "test_transcript_dir", "test_transcript_transcript.md"))

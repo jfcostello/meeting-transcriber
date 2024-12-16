@@ -31,14 +31,25 @@ class TestAudioExtractor(unittest.TestCase):
         os.rmdir(self.output_folder)
 
     def test_extract_audio_successful(self):
-        # BDD: Scenario: Successful processing of a video file - Then the audio is extracted
-        # Test: Checks if the audio is extracted successfully from a video file
+        # BDD:
+        #   Scenario: Successful audio extraction
+        #     Given a valid video file
+        #     When the extract_audio function is called
+        #     Then the function should return the path to the extracted audio file
+        #     And the audio file should exist
+        # Pass Criteria:
+        #   The function returns a valid path to an audio file, and the audio file exists at that path.
         audio_path = extract_audio(self.test_video_file, self.output_folder)
         self.assertTrue(os.path.exists(audio_path))
 
     def test_extract_audio_error(self):
-        # BDD: Scenario: Processing a video file with an error during audio extraction - Then an error message is logged
-        # Test: Checks if an error is raised when ffmpeg fails
+        # BDD:
+        #   Scenario: Error during audio extraction
+        #     Given an invalid video file
+        #     When the extract_audio function is called
+        #     Then the function should raise an exception
+        # Pass Criteria:
+        #   The function raises an exception when called with an invalid video file.
         with self.assertRaises(Exception):
             extract_audio("non_existent_file.mp4", self.output_folder)
 
