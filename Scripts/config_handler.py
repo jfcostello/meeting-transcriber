@@ -7,7 +7,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 def load_config():
-    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
+    test_config_path = os.environ.get('TEST_CONFIG')
+    if test_config_path:
+        config_path = test_config_path
+    else:
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
     try:

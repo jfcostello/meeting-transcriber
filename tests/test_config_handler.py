@@ -8,6 +8,7 @@ class TestConfigHandler(unittest.TestCase):
     def setUp(self):
         # Create a dummy config file for testing
         self.test_config_path = "test_config.yaml"
+        os.environ['TEST_CONFIG'] = self.test_config_path
         self.test_config_content = {
             'meeting_recordings_folder': 'test_recordings',
             'output_structure': {
