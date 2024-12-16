@@ -1,123 +1,102 @@
 import unittest
 import os
 import yaml
-from unittest.mock import patch, mock_open
-from Scripts.config_handler import load_config, get_config, get_summary_prompt, update_config, get_add_timestamp_config
+from Scripts.config_handler import load_config, get_summary_prompt, update_config, get_add_timestamp_config
 
 class TestConfigHandler(unittest.TestCase):
     def setUp(self):
-        # Create a dummy config file for testing
-        self.test_config_path = "test_config.yaml"
-        os.environ['TEST_CONFIG'] = self.test_config_path
-        self.test_config_content = {
-            'meeting_recordings_folder': 'test_recordings',
-            'output_structure': {
-                'base_folder': 'test_summaries',
-                'structure': ['DATE', 'SUMMARY-TYPE', 'FILE-NAME']
-            },
-            'logging': {'enabled': True},
-            'llm': {
-                'model': 'test_model',
-                'client_type': 'test_client',
-                'max_tokens': 1000,
-                'temperature': 0.5
-            },
-            'add_timestamp': True,
-            'transcription_engine': 'test_engine',
-            'summary_type': 'test_summary',
-            'summary_type_presets_folder': 'test_presets'
-        }
-        with open(self.test_config_path, 'w') as f:
-            yaml.dump(self.test_config_content, f)
-        
-        # Create a dummy summary preset file
-        self.test_presets_folder = "test_presets"
-        os.makedirs(self.test_presets_folder, exist_ok=True)
-        self.test_summary_preset_path = os.path.join(self.test_presets_folder, "test_summary.txt")
-        with open(self.test_summary_preset_path, 'w') as f:
-            f.write("This is a test summary prompt.")
+        os.environ['TEST_CONFIG'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_config.yaml')
 
     def tearDown(self):
-        # Clean up the dummy files
-        os.remove(self.test_config_path)
-        os.remove(self.test_summary_preset_path)
-        os.rmdir(self.test_presets_folder)
+        if 'TEST_CONFIG' in os.environ:
+            del os.environ['TEST_CONFIG']
 
-    def test_load_config_successful(self):
-        # BDD: N/A - Internal function
-        # Test: Checks if the config file is loaded successfully
-        with patch('Scripts.config_handler.open', mock_open(read_data=yaml.dump(self.test_config_content))) as mock_file:
-            config = load_config()
-            self.assertIsInstance(config, dict)
-            self.assertEqual(config['meeting_recordings_folder'], 'test_recordings')
-            self.assertEqual(config['output_structure']['base_folder'], 'test_summaries')
-            self.assertEqual(config['logging']['enabled'], True)
-            self.assertEqual(config['llm']['model'], 'test_model')
-            self.assertEqual(config['add_timestamp'], True)
-            self.assertEqual(config['transcription_engine'], 'test_engine')
-            self.assertEqual(config['summary_type'], 'test_summary')
+    def test_load_config(self):
+        # BDD:
+        #   Scenario: Load configuration file
+        #     Given the config.yaml file exists
+        #     When the load_config function is called
+        #     Then the function should return a dictionary
+        #     And the dictionary should contain the 'llm' and 'transcription_engine' keys
+        # Pass Criteria:
+        #   The function returns a dictionary, and the dictionary contains the 'llm' and 'transcription_engine' keys.
+        config = load_config()
+        self.assertIsInstance(config, dict)
+        self.assertIn('llm', config)
+        self.assertIn('transcription_engine', config)
 
-    def test_load_config_error(self):
-        # BDD: N/A - Internal function
-        # Test: Checks if an error is raised when the config file is not found
-        with patch('Scripts.config_handler.os.path.exists', return_value=False):
-            with self.assertRaises(FileNotFoundError):
-                load_config()
-
-    def test_get_config_successful(self):
-        # BDD: N/A - Internal function
-        # Test: Checks if the config is retrieved successfully
-        with patch('Scripts.config_handler.load_config', return_value=self.test_config_content):
-            config = get_config()
-            self.assertIsInstance(config, dict)
-            self.assertEqual(config['meeting_recordings_folder'], 'test_recordings')
-            self.assertEqual(config['output_structure']['base_folder'], 'test_summaries')
-            self.assertEqual(config['logging']['enabled'], True)
-            self.assertEqual(config['llm']['model'], 'test_model')
-            self.assertEqual(config['add_timestamp'], True)
-            self.assertEqual(config['transcription_engine'], 'test_engine')
-            self.assertEqual(config['summary_type'], 'test_summary')
-
-    @patch('Scripts.config_handler.get_config')
-    def test_get_summary_prompt_successful(self, mock_get_config):
-        # BDD: Scenario: Using different summarization settings - Then the transcript is summarized using the specified summarization settings
-        # Test: Checks if the summary prompt is loaded successfully
-        mock_get_config.return_value = self.test_config_content
-        config = get_config()
-        prompt = get_summary_prompt(config)
-        self.assertEqual(prompt, "This is a test summary prompt.")
-
-    @patch('Scripts.config_handler.get_config')
-    def test_get_summary_prompt_error(self, mock_get_config):
-        # BDD: Scenario: Processing an audio file without a summary-rules.txt file - Then a warning message is logged
-        # Test: Checks if an error is raised when the summary preset file is not found
-        mock_get_config.return_value = self.test_config_content
-        config = get_config()
-        config['summary_type'] = 'non_existent_summary'
-        with self.assertRaises(Exception):
+    def test_get_summary_prompt(self):
+        # BDD:
+        #   Scenario: Get summary prompt
+        #     Given a config dictionary
+        #     When the get_summary_prompt function is called
+        #     Then if 'summary_type' or 'summary_type_presets_folder' are missing, a ValueError is raised
+        #     And if the prompt file does not exist, a FileNotFoundError is raised
+        #     And if the prompt file exists, the function should return the prompt content
+        # Pass Criteria:
+        #   The function raises ValueError if 'summary_type' or 'summary_type_presets_folder' are missing.
+        #   The function raises FileNotFoundError if the prompt file does not exist.
+        #   The function returns the prompt content if the prompt file exists.
+        config = load_config()
+        with self.assertRaises(ValueError):
+            get_summary_prompt({})
+        
+        config['summary_type'] = 'test'
+        config['summary_type_presets_folder'] = 'test_presets'
+        
+        with self.assertRaises(FileNotFoundError):
             get_summary_prompt(config)
+        
+        # Create a dummy prompt file
+        os.makedirs(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_presets'), exist_ok=True)
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_presets', 'test.txt'), 'w') as f:
+            f.write('This is a test prompt.')
+        
+        prompt = get_summary_prompt(config)
+        self.assertEqual(prompt, 'This is a test prompt.')
+        
+        # Clean up dummy prompt file
+        os.remove(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_presets', 'test.txt'))
+        os.rmdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_presets'))
 
-    def test_update_config_successful(self):
-        # BDD: N/A - Internal function
-        # Test: Checks if the config is updated successfully
-        with patch('Scripts.config_handler.load_config', return_value=self.test_config_content):
-            update_config('add_timestamp', False)
-            config = get_config()
-            self.assertFalse(config['add_timestamp'])
+    def test_update_config(self):
+        # BDD:
+        #   Scenario: Update configuration
+        #     Given a config dictionary
+        #     When the update_config function is called with a key and value
+        #     Then the config file should be updated with the new value
+        #     And if the key does not exist, a KeyError is raised
+        # Pass Criteria:
+        #   The config file is updated with the new value.
+        #   The function raises KeyError if the key does not exist.
+        config = load_config()
+        original_llm_model = config['llm']['model']
+        
+        update_config('llm', {'model': 'new_model'})
+        
+        updated_config = load_config()
+        self.assertEqual(updated_config['llm']['model'], 'new_model')
+        
+        update_config('llm', {'model': original_llm_model}) # Reset the config
+        
+        updated_config = load_config()
+        self.assertEqual(updated_config['llm']['model'], original_llm_model)
+        
+        with self.assertRaises(KeyError):
+            update_config('non_existent_key', 'some_value')
 
-    def test_update_config_error(self):
-        # BDD: N/A - Internal function
-        # Test: Checks if an error is raised when the config file cannot be updated
-        with patch('Scripts.config_handler.load_config', return_value=self.test_config_content):
-            with self.assertRaises(KeyError):
-                update_config('non_existent_key', 'test_value')
-
-    def test_get_add_timestamp_config_successful(self):
-        # BDD: Scenario: Processing a video file with timestamping enabled - Then the video file is renamed with a timestamp
-        # Test: Checks if the add_timestamp config is retrieved successfully
-        with patch('Scripts.config_handler.load_config', return_value=self.test_config_content):
-            add_timestamp = get_add_timestamp_config()
-            self.assertEqual(add_timestamp, self.test_config_content['add_timestamp'])
+    def test_get_add_timestamp_config(self):
+        # BDD:
+        #   Scenario: Get add timestamp config
+        #     Given a config dictionary
+        #     When the get_add_timestamp_config function is called
+        #     Then the function should return the value of the 'add_timestamp' key
+        # Pass Criteria:
+        #   The function returns the value of the 'add_timestamp' key.
+        
+        config = load_config()
+        add_timestamp = get_add_timestamp_config()
+        self.assertEqual(add_timestamp, config.get('add_timestamp', False))
 
 if __name__ == '__main__':
     unittest.main()

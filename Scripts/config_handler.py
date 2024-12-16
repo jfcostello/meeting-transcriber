@@ -57,7 +57,11 @@ def update_config(key, value):
     if key not in config:
         raise KeyError(f"Key '{key}' not found in config")
     config[key] = value
-    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
+    test_config_path = os.environ.get('TEST_CONFIG')
+    if test_config_path:
+        config_path = test_config_path
+    else:
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
     try:
         with open(config_path, 'w') as file:
             yaml.dump(config, file)
