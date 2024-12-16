@@ -24,3 +24,4 @@ summary_type_presets/*
 __pycache__/
 .DS_Store
 .history/
+Legacy/
