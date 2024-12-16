@@ -25,8 +25,14 @@ class TestTranscriberUtils(unittest.TestCase):
     @patch('Scripts.transcriber_utils.whisper.load_model')
     @patch('Scripts.transcriber_utils.whisper.load_audio')
     def test_transcribe_with_whisper_successful(self, mock_load_audio, mock_load_model):
-        # BDD: Scenario: Using different transcription engines - Then the audio file is transcribed using the specified transcription engine
-        # Test: Checks if the whisper transcription is executed successfully
+        # BDD:
+        #   Scenario: Successful transcription with Whisper
+        #     Given an audio file and whisper config
+        #     When the transcribe_with_whisper function is called
+        #     Then the audio file should be transcribed using whisper
+        #     And the function should return the path to the transcript file
+        # Pass Criteria:
+        #   The audio file is transcribed using whisper, and the function returns the path to the transcript file.
         mock_model = MagicMock()
         mock_load_model.return_value = mock_model
         mock_result = {"text": "This is a test whisper transcript."}
@@ -43,8 +49,14 @@ class TestTranscriberUtils(unittest.TestCase):
 
     @patch('Scripts.transcriber_utils.WhisperModel')
     def test_transcribe_with_faster_whisper_successful(self, mock_whisper_model):
-        # BDD: Scenario: Using different transcription engines - Then the audio file is transcribed using the specified transcription engine
-        # Test: Checks if the faster whisper transcription is executed successfully
+        # BDD:
+        #   Scenario: Successful transcription with Faster Whisper
+        #     Given an audio file and faster whisper config
+        #     When the transcribe_with_faster_whisper function is called
+        #     Then the audio file should be transcribed using faster whisper
+        #     And the function should return the path to the transcript file
+        # Pass Criteria:
+        #   The audio file is transcribed using faster whisper, and the function returns the path to the transcript file.
         mock_model = MagicMock()
         mock_whisper_model.return_value = mock_model
         mock_segments = [MagicMock(text="This is a test faster whisper transcript.", id=1)]
@@ -59,15 +71,25 @@ class TestTranscriberUtils(unittest.TestCase):
         mock_model.transcribe.assert_called_once()
 
     def test_transcribe_with_whisper_error(self):
-        # BDD: Scenario: Processing an audio file with an error during transcription - Then an error message is logged
-        # Test: Checks if an error is raised when whisper transcription fails
+        # BDD:
+        #   Scenario: Error during Whisper transcription
+        #     Given an audio file and whisper config
+        #     When the transcribe_with_whisper function is called and an error occurs
+        #     Then the function should raise an exception
+        # Pass Criteria:
+        #   The function raises an exception when an error occurs during whisper transcription.
         config = self.test_config.copy()
         with self.assertRaises(Exception):
             transcribe_with_whisper("non_existent_file.mp3", self.test_audio_folder, config['whisper'])
 
     def test_transcribe_with_faster_whisper_error(self):
-        # BDD: Scenario: Processing an audio file with an error during transcription - Then an error message is logged
-        # Test: Checks if an error is raised when faster whisper transcription fails
+        # BDD:
+        #   Scenario: Error during Faster Whisper transcription
+        #     Given an audio file and faster whisper config
+        #     When the transcribe_with_faster_whisper function is called and an error occurs
+        #     Then the function should raise an exception
+        # Pass Criteria:
+        #   The function raises an exception when an error occurs during faster whisper transcription.
         config = self.test_config.copy()
         with self.assertRaises(Exception):
             transcribe_with_faster_whisper("non_existent_file.mp3", self.test_audio_folder, config['faster_whisper'])
@@ -75,8 +97,13 @@ class TestTranscriberUtils(unittest.TestCase):
     @patch('Scripts.transcriber_utils.transcribe_with_whisper')
     @patch('Scripts.transcriber_utils.transcribe_with_faster_whisper')
     def test_transcribe_audio_selects_whisper(self, mock_faster_whisper, mock_whisper):
-        # BDD: Scenario: Using different transcription engines - Then the audio file is transcribed using the specified transcription engine
-        # Test: Checks if the correct transcription engine is selected (whisper)
+        # BDD:
+        #   Scenario: Select Whisper transcription engine
+        #     Given an audio file and a config with 'whisper' as the transcription engine
+        #     When the transcribe_audio function is called
+        #     Then the whisper transcription engine should be selected
+        # Pass Criteria:
+        #   The whisper transcription engine is selected.
         config = self.test_config.copy()
         config['transcription_engine'] = 'whisper'
         transcribe_audio(self.test_audio_file, self.test_audio_folder, config)
@@ -86,8 +113,13 @@ class TestTranscriberUtils(unittest.TestCase):
     @patch('Scripts.transcriber_utils.transcribe_with_whisper')
     @patch('Scripts.transcriber_utils.transcribe_with_faster_whisper')
     def test_transcribe_audio_selects_faster_whisper(self, mock_faster_whisper, mock_whisper):
-        # BDD: Scenario: Using different transcription engines - Then the audio file is transcribed using the specified transcription engine
-        # Test: Checks if the correct transcription engine is selected (faster_whisper)
+        # BDD:
+        #   Scenario: Select Faster Whisper transcription engine
+        #     Given an audio file and a config with 'faster_whisper' as the transcription engine
+        #     When the transcribe_audio function is called
+        #     Then the faster whisper transcription engine should be selected
+        # Pass Criteria:
+        #   The faster whisper transcription engine is selected.
         config = self.test_config.copy()
         config['transcription_engine'] = 'faster_whisper'
         transcribe_audio(self.test_audio_file, self.test_audio_folder, config)
@@ -95,8 +127,13 @@ class TestTranscriberUtils(unittest.TestCase):
         mock_whisper.assert_not_called()
 
     def test_transcribe_audio_unsupported_engine(self):
-        # BDD: N/A
-        # Test: Checks if an error is raised for an unsupported transcription engine
+        # BDD:
+        #   Scenario: Unsupported transcription engine
+        #     Given an audio file and a config with an unsupported transcription engine
+        #     When the transcribe_audio function is called
+        #     Then the function should raise a ValueError
+        # Pass Criteria:
+        #   The function raises a ValueError when an unsupported transcription engine is specified.
         config = self.test_config.copy()
         config['transcription_engine'] = 'unsupported'
         with self.assertRaises(ValueError):

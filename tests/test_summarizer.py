@@ -34,8 +34,14 @@ class TestSummarizer(unittest.TestCase):
 
     @patch('Scripts.summarizer.call_llm_api')
     def test_summarize_transcript_successful(self, mock_call_llm_api):
-        # BDD: Scenario: Successful processing of a transcript file - Then the transcript is summarized and the summary is saved in the output folder
-        # Test: Checks if the transcript is summarized successfully
+        # BDD:
+        #   Scenario: Successful summarization of a transcript
+        #     Given a transcript file
+        #     When the summarize_transcript function is called
+        #     Then the transcript should be summarized
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The transcript is summarized, and the summary file is created.
         mock_call_llm_api.return_value = "This is a test summary."
         config = self.test_config.copy()
         summary_path = summarize_transcript(self.test_transcript_file, config)
@@ -46,8 +52,15 @@ class TestSummarizer(unittest.TestCase):
 
     @patch('Scripts.summarizer.call_llm_api')
     def test_summarize_transcript_no_summary_rules(self, mock_call_llm_api):
-        # BDD: Scenario: Processing a transcript file without a summary-rules.txt file - Then a warning message is logged and the transcript is summarized using default settings
-        # Test: Checks if the transcript is summarized successfully when no summary rules are provided
+        # BDD:
+        #   Scenario: Summarization of a transcript without summary rules
+        #     Given a transcript file without a summary-rules.txt file
+        #     When the summarize_transcript function is called
+        #     Then a warning message should be logged
+        #     And the transcript should be summarized using default settings
+        #     And the summary should be saved in the output folder
+        # Pass Criteria:
+        #   The transcript is summarized, the summary file is created, and a warning message is logged.
         mock_call_llm_api.return_value = "This is a test summary."
         config = self.test_config.copy()
         os.remove(self.test_summary_rules_file)
@@ -58,15 +71,25 @@ class TestSummarizer(unittest.TestCase):
         self.assertEqual(summary, "This is a test summary.")
 
     def test_summarize_transcript_error(self):
-        # BDD: Scenario: Processing a transcript file with an error during summarization - Then an error message is logged
-        # Test: Checks if an error is raised when the LLM API call fails
+        # BDD:
+        #   Scenario: Error during transcript summarization
+        #     Given a transcript file
+        #     When the summarize_transcript function is called and an error occurs
+        #     Then the function should raise an exception
+        # Pass Criteria:
+        #   The function raises an exception when an error occurs during summarization.
         config = self.test_config.copy()
         with self.assertRaises(Exception):
             summarize_transcript("non_existent_file.md", config)
 
     def test_get_unique_filename(self):
-        # BDD: N/A - Internal function
-        # Test: Checks if the unique filename is generated correctly
+        # BDD:
+        #   Scenario: Generate unique filename
+        #     Given a base file path
+        #     When the get_unique_filename function is called
+        #     Then the function should return a unique file path
+        # Pass Criteria:
+        #   The function returns a unique file path, appending a number if the file already exists.
         base_path = os.path.join(self.test_transcript_folder, "test_transcript_summary.md")
         unique_path = get_unique_filename(base_path)
         self.assertEqual(unique_path, base_path)

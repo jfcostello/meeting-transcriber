@@ -27,15 +27,25 @@ class TestUtils(unittest.TestCase):
         shutil.rmtree("test_output")
 
     def test_move_file_no_structure(self):
-        # BDD: Scenario: Using different output structures - Then the output file is saved in the specified output structure
-        # Test: Checks if the file is moved correctly when no output structure is specified
+        # BDD:
+        #   Scenario: Move file with no output structure
+        #     Given a file and a config with no output structure
+        #     When the move_file function is called
+        #     Then the file should be moved to the base output folder
+        # Pass Criteria:
+        #   The file is moved to the base output folder.
         config = self.test_config.copy()
         move_file(self.test_file, config)
         self.assertTrue(os.path.exists(os.path.join("test_output", "test_file.txt")))
 
     def test_move_file_with_date_structure(self):
-        # BDD: Scenario: Using different output structures - Then the output file is saved in the specified output structure
-        # Test: Checks if the file is moved correctly when the output structure includes date
+        # BDD:
+        #   Scenario: Move file with date output structure
+        #     Given a file and a config with 'DATE' in the output structure
+        #     When the move_file function is called
+        #     Then the file should be moved to a folder with the current date
+        # Pass Criteria:
+        #   The file is moved to a folder with the current date.
         config = self.test_config.copy()
         config['output_structure']['structure'] = ['DATE']
         move_file(self.test_file, config)
@@ -43,16 +53,26 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join("test_output", today_date, "test_file.txt")))
 
     def test_move_file_with_filename_structure(self):
-        # BDD: Scenario: Using different output structures - Then the output file is saved in the specified output structure
-        # Test: Checks if the file is moved correctly when the output structure includes filename
+        # BDD:
+        #   Scenario: Move file with filename output structure
+        #     Given a file and a config with 'FILE-NAME' in the output structure
+        #     When the move_file function is called
+        #     Then the file should be moved to a folder with the same name as the file
+        # Pass Criteria:
+        #   The file is moved to a folder with the same name as the file.
         config = self.test_config.copy()
         config['output_structure']['structure'] = ['FILE-NAME']
         move_file(self.test_file, config)
         self.assertTrue(os.path.exists(os.path.join("test_output", "test_file", "test_file.txt")))
 
     def test_move_file_with_summary_type_structure(self):
-        # BDD: Scenario: Using different output structures - Then the output file is saved in the specified output structure
-        # Test: Checks if the file is moved correctly when the output structure includes summary type
+        # BDD:
+        #   Scenario: Move file with summary type output structure
+        #     Given a file and a config with 'SUMMARY-TYPE' in the output structure
+        #     When the move_file function is called
+        #     Then the file should be moved to a folder with the summary type
+        # Pass Criteria:
+        #   The file is moved to a folder with the summary type.
         config = self.test_config.copy()
         config['output_structure']['structure'] = ['SUMMARY-TYPE']
         os.makedirs(os.path.join(self.test_source_folder, "test_summary_type"), exist_ok=True)
@@ -62,8 +82,13 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join("test_output", "test_summary_type", "test_file.txt")))
 
     def test_move_file_with_all_structures(self):
-        # BDD: Scenario: Using different output structures - Then the output file is saved in the specified output structure
-        # Test: Checks if the file is moved correctly when all output structures are included
+        # BDD:
+        #   Scenario: Move file with all output structures
+        #     Given a file and a config with 'DATE', 'SUMMARY-TYPE', and 'FILE-NAME' in the output structure
+        #     When the move_file function is called
+        #     Then the file should be moved to a folder structure based on the date, summary type, and file name
+        # Pass Criteria:
+        #   The file is moved to a folder structure based on the date, summary type, and file name.
         config = self.test_config.copy()
         config['output_structure']['structure'] = ['DATE', 'SUMMARY-TYPE', 'FILE-NAME']
         os.makedirs(os.path.join(self.test_source_folder, "test_summary_type"), exist_ok=True)
