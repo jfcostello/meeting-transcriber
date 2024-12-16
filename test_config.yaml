@@ -1,0 +1,4 @@
+add_timestamp: false
+llm:
+  model: test-model
+transcription_engine: test-engine
