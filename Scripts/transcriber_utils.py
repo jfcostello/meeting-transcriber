@@ -9,7 +9,7 @@ from faster_whisper import WhisperModel
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def transcribe_with_whisper(audio_file_path, output_folder, config, summary_rules=None):
+def transcribe_with_whisper(audio_file_path, output_folder, config):
     """
     Transcribe audio using OpenAI's Whisper model.
     """
@@ -54,13 +54,12 @@ def transcribe_with_whisper(audio_file_path, output_folder, config, summary_rule
             # Pad or trim the segment
             segment = pad_or_trim(segment)
 
-            # Log the language and initial_prompt
+            # Log the language
             language = config.get('language', "auto")
             logger.info(f"Transcribe language: {language}")
-            logger.info(f"Transcribe initial_prompt: {summary_rules}")
 
             # Transcribe the segment
-            result = model.transcribe(segment, language=language, initial_prompt=summary_rules)
+            result = model.transcribe(segment, language=language)
 
             full_transcript.append(result["text"])
             logger.info(f"Segment {i+1} transcription: {result['text']}")  # Changed to info
@@ -75,7 +74,7 @@ def transcribe_with_whisper(audio_file_path, output_folder, config, summary_rule
         logger.error(f"Error processing {file_name} with Whisper: {str(e)}")
         return None
 
-def transcribe_with_faster_whisper(audio_file_path, output_folder, config, summary_rules=None):
+def transcribe_with_faster_whisper(audio_file_path, output_folder, config):
     """
     Transcribe audio using Faster Whisper model.
     """
@@ -96,7 +95,7 @@ def transcribe_with_faster_whisper(audio_file_path, output_folder, config, summa
         model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
         # Use the vad_filter parameter in the transcribe method
-        segments, info = model.transcribe(audio_file_path, beam_size=beam_size, vad_filter=vad_filter, initial_prompt=summary_rules)
+        segments, info = model.transcribe(audio_file_path, beam_size=beam_size, vad_filter=vad_filter)
 
         transcript_text = ""
         for segment in segments:
@@ -113,15 +112,15 @@ def transcribe_with_faster_whisper(audio_file_path, output_folder, config, summa
         logger.error(f"Error processing {file_name} with Faster Whisper: {str(e)}")
         return None
 
-def transcribe_audio(audio_file_path, output_folder, config, summary_rules=None):
+def transcribe_audio(audio_file_path, output_folder, config):
     """
     Select and execute the appropriate transcription engine based on configuration.
     """
     engine = config.get('transcription_engine', 'whisper')
     output_folder = os.path.dirname(audio_file_path)
     if engine == 'whisper':
-        return transcribe_with_whisper(audio_file_path, output_folder, config.get('whisper', {}), summary_rules)
+        return transcribe_with_whisper(audio_file_path, output_folder, config.get('whisper', {}))
     elif engine == 'faster_whisper':
-        return transcribe_with_faster_whisper(audio_file_path, output_folder, config.get('faster_whisper', {}), summary_rules)
+        return transcribe_with_faster_whisper(audio_file_path, output_folder, config.get('faster_whisper', {}))
     else:
         raise ValueError(f"Unsupported transcription engine: {engine}")

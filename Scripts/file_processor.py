@@ -51,11 +51,7 @@ def process_audio_files(queue_folder, config):
                         try:
                             print(f"Processing audio: {new_filename}")
                             
-                            # Read the summary rules from the file
-                            with open(summary_rules_path, 'r') as f:
-                                summary_rules = f.read().strip()
-
-                            transcript_path = transcribe_audio_flow(new_path, queue_folder, config, summary_rules)
+                            transcript_path = transcribe_audio_flow(new_path, queue_folder, config)
                             move_file(new_path, config)
                             print(f"Audio processed and moved: {new_filename}")
                         except Exception as e:
