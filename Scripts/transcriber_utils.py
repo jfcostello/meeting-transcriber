@@ -35,6 +35,7 @@ def transcribe_with_whisper(audio_file_path, output_folder, config, summary_rule
 
     # Load Whisper model
     model = whisper.load_model(config.get('model', 'base')).to(device)
+    logger.info(f"Whisper model dimensions: {model.dims}")
 
     try:
         # Load audio
@@ -53,8 +54,13 @@ def transcribe_with_whisper(audio_file_path, output_folder, config, summary_rule
             # Pad or trim the segment
             segment = pad_or_trim(segment)
 
+            # Log the language and initial_prompt
+            language = config.get('language', "auto")
+            logger.info(f"Transcribe language: {language}")
+            logger.info(f"Transcribe initial_prompt: {summary_rules}")
+
             # Transcribe the segment
-            result = model.transcribe(segment, language=config.get('language', "auto"), initial_prompt=summary_rules)
+            result = model.transcribe(segment, language=language, initial_prompt=summary_rules)
 
             full_transcript.append(result["text"])
             logger.info(f"Segment {i+1} transcription: {result['text']}")  # Changed to info
