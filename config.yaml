@@ -2,8 +2,9 @@
 meeting_recordings_folder: "meeting_recording_queue/Easy_Voice_Recorder"
 
 # Output folder configuration, where you want the final output and original files to be saved
-# Base folder is he primary directory where summaries will be saved and copies of the original files will be placed
-# Structure is an optional list of sub directories which will be created within the base folder. Date is date in YYYY-MM-DD format, file-name is the name of the original file, and summary-type is the folder the file was originally placed in. You can choose none, some or all and put them in any order. If none, everything will be saved in the base folder.
+# Base folder is he primary folder where summaries will be saved and copies of the original files will be placed
+# Structure is an optional list of sub folders which will be created within the base folder. Date is date in YYYY-MM-DD format, file-name is the name of the original file, and summary-type is the folder the file was originally placed in. You can choose none, some or all and put them in any order. If none, everything will be saved in the base folder.
+# You can nest sub folders infinitely deep within the base folder, so long as there is a summary-rules.txt file in the folder it will be picked up and converted. Only the folder the file is in will be used for the output folder summary-type.
 output_structure:
   base_folder: "summaries" 
   structure: ["DATE", "SUMMARY-TYPE", "FILE-NAME"]  # Options: DATE, FILE-NAME, SUMMARY-TYPE, placed in quotation marks, seperated by commas

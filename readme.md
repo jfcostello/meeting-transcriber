@@ -59,33 +59,47 @@ Before installing the Python packages, ensure you have the following system depe
 
 ## Usage
 
-1. Place your video or audio files in the `meeting_recording_queue` folder.
-2. Run the main script:
+1. Create folders within your `meeting_recordings_folder` (configured in config.yaml)
+2. In each folder, create a `summary-rules.txt` file containing the system prompt for summarization
+3. Place your video or audio files in the appropriate folders
+4. Run the main script:
    ```
    python main.py
    ```
-3. Check the output folders for transcripts and summaries.
+5. Check the output folders for transcripts and summaries
+
+The system will:
+- Recursively search through all subfolders
+- Process files in any folder containing a summary-rules.txt file
+- Use the content of summary-rules.txt as the system prompt for summarization
+- Maintain folder structure in the output
+
+## Folder Structure Example
+
+```
+meeting_recordings_folder/
+├── ProjectA/
+│   ├── summary-rules.txt
+│   ├── meeting1.mp4
+│   ├── meeting2.wav
+│   └── SubProject/
+│       ├── summary-rules.txt
+│       └── discussion.mp3
+└── ProjectB/
+    ├── summary-rules.txt
+    └── brainstorming.m4a
+```
 
 ## Configuration
 
 The `config.yaml` file allows you to customize various aspects of the transcription and summarization process. Here's a detailed breakdown of each configuration option:
 
-### Summary Settings
-
-- `summary_type`: In the folder summary_type_presents you'll find a couple of default pre set system prompts. To choose which system prompt to use, just put the name of the .txt file here without .txt. So for meeting.txt in /summary_type_presents/ use the value "meeting". 
-
-#### Summary Type Presets
-
-You can create custom summary types by adding `.txt` files to the `summary_type_presets_folder`. The content of these files will be used as the system prompt for the LLM when generating summaries. There is a default meetings one there already, and a 'custom' one used for ad-hoc one off requests. There's no limit to how many you can create, and feel free to modify any that are there. Just create a .txt file and when you want to select it add it to the summary_type in config.yaml
-
 ### Folder Paths
 
-- `meeting_recordings_folder`: The folder where input files are placed for processing.
-- `processed_video_folder`: The folder where processed video files are moved.
-- `processed_audio_folder`: The folder where processed audio files are moved.
-- `transcripts_folder`: The folder where generated transcripts are saved.
-- `summaries_folder`: The folder where generated summaries are saved.
-- `summary_type_presets_folder`: The folder containing summary type preset files.
+- `meeting_recordings_folder`: The root folder where your organized recordings are stored
+- `output_structure`: Configuration for how processed files are organized
+  - `base_folder`: The root folder for all outputs
+  - `structure`: List of subdirectory components (DATE, SUMMARY-TYPE, FILE-NAME)
 
 ### Transcription Engine Settings
 
