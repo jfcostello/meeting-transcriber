@@ -35,7 +35,7 @@ whisper:
   use_fp16: "auto"    # "auto", true, or false
   segment_length: "auto"  # "auto" or an integer (seconds)
 
-# Faster Whisper Settings, if you're susing faster_whisper
+# Faster Whisper Settings, if you're ussing faster_whisper
 faster_whisper:
   model: "small.en"         # Specify the Faster Whisper model size
   device: "auto"           # Options: "auto", "cpu", "cuda"
@@ -43,3 +43,17 @@ faster_whisper:
   beam_size: 5             # Beam size for transcription, beam size of 5 is a good default. A higher beam size may improve accuracy but will be slower.
   trim_silence: "true"      # Trim silence from the audio file, useful to make transcriptions even faster
 
+
+# Whisper x Settings, if you're using WhisperX (This does not work...yet)
+whisperx:
+  model: "turbo"               
+  device: "auto"                  # "auto", "cpu", "cuda"
+  compute_type: "auto"         # "int8", "int8_float16", ...
+  language: "en"                  # "auto", "en", "de", etc.
+  batch_size: 1               # Adjust based on GPU memory
+  diarize: "true"                 # Enable speaker diarization
+  hf_token: "token"  # Hugging Face token for pyannote models
+  # min_speakers: 2
+  # max_speakers: 2
+  return_char_alignments: "false"
+  highlight_words: "false"
