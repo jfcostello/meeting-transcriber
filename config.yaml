@@ -44,7 +44,7 @@ faster_whisper:
   trim_silence: "true"      # Trim silence from the audio file, useful to make transcriptions even faster
 
 
-# Whisper x Settings, if you're using WhisperX (This does not work...yet)
+# Whisper x Settings, if you're using WhisperX (Not thoroughly tested yet, but it has speaker labels so the transcript is far more readable)
 whisperx:
   model: "turbo"               
   device: "auto"                  # "auto", "cpu", "cuda"
@@ -52,7 +52,7 @@ whisperx:
   language: "en"                  # "auto", "en", "de", etc.
   batch_size: 1               # Adjust based on GPU memory
   diarize: "true"                 # Enable speaker diarization
-  hf_token: "token"  # Hugging Face token for pyannote models
+  hf_token: "INSERT YOUR HF TOKEN HERE"  # Hugging Face token for pyannote models
   # min_speakers: 2
   # max_speakers: 2
   return_char_alignments: "false"
