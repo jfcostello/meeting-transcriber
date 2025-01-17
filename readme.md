@@ -123,6 +123,37 @@ Faster Whisper is a faster and more efficient version of Whisper, which may be m
 - `compute_type`: The compute type for processing. Options are "float16", "int8_float16", or "int8".
 - `beam_size`: The beam size for transcription.
 
+#### WhisperX Settings
+
+WhisperX provides enhanced transcription capabilities with speaker diarization and word-level alignment. Before using WhisperX, you'll need to:
+
+1. Get a Hugging Face token from [Hugging Face](https://huggingface.co/settings/tokens)
+2. Agree to the terms of service for:
+   - [Segmentation](https://huggingface.co/pyannote/segmentation-3.0)
+   - [Speaker-Diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
+
+Note: The model runs entirely locally - the Hugging Face token is only required for accepting the terms of service.
+
+Configuration options:
+
+- `model`: The Whisper model to use. Options include "tiny", "base", "small", "medium", and "large". Larger models provide better accuracy but require more resources.
+- `device`: The processing device. Options are:
+  - "auto": Automatically selects the best available device
+  - "cpu": Forces CPU processing
+  - "cuda": Uses GPU acceleration if available
+- `compute_type`: The precision mode for processing. Options are:
+  - "auto": Automatically selects the best available precision
+  - "int8": 8-bit integer precision (fastest, least memory usage)
+  - "int8_float16": Mixed precision for better accuracy
+- `language`: The language of the audio. Set to "auto" for automatic detection or specify a language code (e.g., "en" for English).
+- `batch_size`: Number of audio segments processed simultaneously. Adjust based on available GPU memory (default: 1).
+- `diarize`: Enable speaker diarization to identify different speakers in the audio. Set to "true" or "false".
+- `hf_token`: Your Hugging Face token for accessing speaker diarization models.
+- `min_speakers`: (Optional) Minimum number of speakers to detect.
+- `max_speakers`: (Optional) Maximum number of speakers to detect.
+- `return_char_alignments`: Enable character-level alignment for precise word timestamps. Set to "true" or "false".
+- `highlight_words`: Highlight words in the transcription with timestamps. Set to "true" or "false".
+
 ### LLM Settings
 
 The LLM (Large Language Model) settings control how the summarization process works. These settings are crucial for determining which AI model will generate the summary and how it will behave.
