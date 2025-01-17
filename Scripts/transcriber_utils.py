@@ -126,7 +126,8 @@ def transcribe_with_whisperx(audio_file_path, output_folder, config):
         compute_type = config.get("compute_type", "float16")
         language = config.get("language", "en")
         batch_size = config.get("batch_size", 16)
-        
+
+        # Determine which device to use
         cuda_available = torch.cuda.is_available()
         cuda_enabled = torch.backends.cudnn.enabled and torch.backends.cuda.is_built()
         if device == "auto":
@@ -135,49 +136,50 @@ def transcribe_with_whisperx(audio_file_path, output_folder, config):
             logger.warning("CUDA requested but not available. Falling back to CPU.")
             device = "cpu"
 
+        # Get diarization settings
         diarize = str(config.get("diarize", "false")).lower() == "true"
         hf_token = config.get("hf_token", None)
         min_speakers = config.get("min_speakers", None)
         max_speakers = config.get("max_speakers", None)
         return_char_alignments = str(config.get("return_char_alignments", "false")).lower() == "true"
-        # Removed 'vad_filter' usage here, since it's not supported in the Python function:
-        # vad_filter = str(config.get("vad_filter", "true")).lower() == "true"
         highlight_words = str(config.get("highlight_words", "false")).lower() == "true"
 
         logger.info(f"Using WhisperX model: {model_name} on device: {device}")
-        
-        # 1) Transcribe (faster-whisper backend) in WhisperX
+
+        # 1) Load the faster-whisper pipeline in WhisperX
         model = whisperx.load_model(model_name, device, compute_type=compute_type)
         audio = whisperx.load_audio(audio_file_path)
         logger.info(f"WhisperX transcribing with batch_size={batch_size}")
 
-        # Remove 'vad_filter=vad_filter' from here
         result = model.transcribe(
-            audio, 
+            audio,
             batch_size=batch_size,
-            language=language,
+            language=language
         )
-        
+
         # 2) Align with wav2vec2
         logger.info(f"Loading alignment model for language '{result['language']}'")
-        align_model, metadata = whisperx.load_align_model(language_code=result["language"], device=device)
+        align_model, metadata = whisperx.load_align_model(
+            language_code=result["language"], 
+            device=device
+        )
         result = whisperx.align(
-            result["segments"], 
-            align_model, 
-            metadata, 
-            audio, 
-            device, 
+            result["segments"],
+            align_model,
+            metadata,
+            audio,
+            device,
             return_char_alignments=return_char_alignments
         )
 
-        # 3) Optional speaker diarization
+        # 3) (Optional) Speaker Diarization
         if diarize:
             if not hf_token:
                 logger.warning("Diarization requested but no hf_token supplied. Diarization will fail.")
             else:
                 logger.info(f"Running speaker diarization with token: {hf_token}")
                 diarize_model = whisperx.DiarizationPipeline(
-                    use_auth_token=hf_token, 
+                    use_auth_token=hf_token,
                     device=device
                 )
                 diarize_segments = diarize_model(
@@ -188,15 +190,25 @@ def transcribe_with_whisperx(audio_file_path, output_folder, config):
                 result = whisperx.assign_word_speakers(diarize_segments, result)
 
         # Combine text for writing to a single markdown file
-        transcript_text = ""
+        # We'll collect each segment line in a list, then join them with double newlines.
+        lines = []
         for seg in result["segments"]:
-            speaker_label = ""
-            if diarize and "speaker" in seg:
-                speaker_label = f"Speaker {seg['speaker']}: "
-            transcript_text += f"{speaker_label}{seg['text']} "
+            text = seg["text"].strip()
+            speaker_label = seg.get("speaker", "") if diarize else ""
+            # Remove "Speaker " if present, e.g. "Speaker SPEAKER_00" => "SPEAKER_00"
+            speaker_label = speaker_label.replace("Speaker ", "").strip()
 
+            if speaker_label:
+                lines.append(f"{speaker_label}: {text}")
+            else:
+                # No diarization => just the text
+                lines.append(text)
+
+        transcript_text = "\n\n".join(lines)
+
+        # Save transcript
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write(transcript_text.strip())
+            f.write(transcript_text)
 
         logger.info(f"WhisperX transcript saved: {output_path}")
         return output_path
