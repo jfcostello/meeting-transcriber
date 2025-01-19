@@ -136,7 +136,7 @@ Note: The model runs entirely locally - the Hugging Face token is only required 
 
 Configuration options:
 
-- `model`: The Whisper model to use. Options include "tiny", "base", "small", "medium", and "large". Larger models provide better accuracy but require more resources.
+- `model`: The Whisper model to use. List as type of writing - tiny.en, tiny, base.en, base, small.en, small, medium.en, medium, large-v1, large-v2, large-v3, large, distil-large-v2, distil-medium.en, distil-small.en, distil-large-v3, large-v3-turbo, turbo
 - `device`: The processing device. Options are:
   - "auto": Automatically selects the best available device
   - "cpu": Forces CPU processing
@@ -153,6 +153,8 @@ Configuration options:
 - `max_speakers`: (Optional) Maximum number of speakers to detect.
 - `return_char_alignments`: Enable character-level alignment for precise word timestamps. Set to "true" or "false".
 - `highlight_words`: Highlight words in the transcription with timestamps. Set to "true" or "false".
+
+Accepted model
 
 ### LLM Settings
 
