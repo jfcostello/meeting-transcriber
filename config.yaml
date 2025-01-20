@@ -13,18 +13,22 @@ output_structure:
 logging:
   enabled: true
 
-# You can use 'Anthropic' 'OpenAI' 'Groq' 'gemini' or 'Replicate', any model there will do. You can also use OpenAIs API endpoint for local models by setting client_type to local_openai
+# You can use 'anthropic' 'openai' 'groq' 'gemini' or 'replicate', any model there will do. You can also use OpenAIs API endpoint for local models by setting client_type to local_openai
 llm:
-  model: "gemini-exp-1206"
-  client_type: gemini
+#  model: "gemini-exp-1206"
+#  client_type: gemini
+#  model: "gpt-4o-2024-11-20"
+#  client_type: openai
+  model: "claude-3-5-sonnet-20241022"
+  client_type: anthropic
   max_tokens: 8192
-  temperature: 0.2
+  temperature: 1
 
 # Setting to modify the name of the file after it processes it to add a timestamp which can keep your outpout folders organized
 add_timestamp: false
 
 # Transcription Engine Configuration
-transcription_engine: "faster_whisper"  # Options: "whisper", "faster_whisper", faster_whisper can be useful for larger files and/or if you don't have a GPU
+transcription_engine: "whisperx"  # Options: "whisper", "faster_whisper", faster_whisper can be useful for larger files and/or if you don't have a GPU
 
 # Whisper settings, if you're using Whisoer
 whisper:
@@ -46,7 +50,7 @@ faster_whisper:
 
 # Whisper x Settings, if you're using WhisperX (Not thoroughly tested yet, but it has speaker labels so the transcript is far more readable)
 whisperx:
-  model: "turbo"               
+  model: "small.en"               
   device: "auto"                  # "auto", "cpu", "cuda"
   compute_type: "auto"         # "int8", "int8_float16", ...
   language: "en"                  # "auto", "en", "de", etc.
