@@ -1,7 +1,7 @@
 paths:
-  input: ./data/input
-  output: ./data/output
-  state: ./data/state
+  input: /data/input
+  output: /data/output
+  state: /data/state
 
 timezone: America/Toronto
 
@@ -11,7 +11,6 @@ worker:
   retry_delays_seconds: [60, 300, 1800, 7200]
 
 transcription:
-  # Deliberately unset until the GPU PC is prepared.
   model: ${WHISPER_MODEL}
   device: cuda
   compute_type: int8_float16

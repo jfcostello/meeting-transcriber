@@ -1,0 +1,17 @@
+services:
+  transcriber:
+    build: .
+    restart: unless-stopped
+    gpus: all
+    env_file:
+      - .env
+    volumes:
+      - ./data/input:/data/input:ro
+      - ./data/output:/data/output
+      - ./data/state:/data/state
+      - ./data/cache:/cache
+      - ./config.container.yaml:/app/config.yaml:ro
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

@@ -1,226 +1,82 @@
 # Meeting Transcriber
 
-Meeting Transcriber is a Python-based tool that automates the process of transcribing and summarizing audio and video files. It uses OpenAI's Whisper for transcription and various LLM APIs for summarization.
+A private, durable GPU worker for meeting audio. It watches a queue, waits for files to finish copying, deduplicates by SHA-256, runs WhisperX alignment and **mandatory speaker diarization**, and emits a structured bundle for later Logseq insertion.
 
-## Features
+No cloud transcription or summarization provider is included. A local summarizer will be selected separately.
 
-- Processes video files to extract audio
-- Transcribes audio files using Whisper
-- Summarizes transcripts using configurable LLM APIs
-- Configurable settings via `config.yaml`
-- Supports multiple LLM providers (OpenAI, Anthropic, Google, Replicate, Together AI)
+## Architecture
 
-## Installation
+- The GPU PC runs this worker and owns transcription compute.
+- NDO remains the Logseq writer and retains the graph encryption key.
+- Every completed job contains the original audio, a diarized JSON transcript, readable Markdown, source timestamps, and a Logseq integration placeholder.
+- Originals are never moved or deleted.
+- Queue state is durable in SQLite. Interrupted jobs return to the queue, failures retry with backoff, and identical audio is processed once.
 
-### System Dependencies
+## Required setup
 
-Before installing the Python packages, ensure you have the following system dependency:
+The production target is an NVIDIA GPU with a current driver capable of CUDA 12.8. The container includes the remaining CUDA/cuDNN runtime and a pinned WhisperX revision.
 
-- ffmpeg: Required for audio/video processing
+WhisperX diarization requires a Hugging Face read token and acceptance of the terms for [`pyannote/speaker-diarization-community-1`](https://huggingface.co/pyannote/speaker-diarization-community-1).
 
-#### Installing ffmpeg
+```bash
+cp .env.example .env
+# Set HF_TOKEN and, later, WHISPER_MODEL.
+docker compose -f compose.gpu.yaml build
+docker compose -f compose.gpu.yaml run --rm transcriber doctor --runtime
+docker compose -f compose.gpu.yaml up -d
+```
 
-- On Ubuntu or Debian:
-  ```
-  sudo apt update && sudo apt install ffmpeg
-  ```
+The model is intentionally unset. The worker will refuse to process audio until `WHISPER_MODEL` is explicitly selected.
 
-- On macOS (using Homebrew):
-  ```
-  brew install ffmpeg
-  ```
+## Paths
 
-- On Windows (using Chocolatey):
-  ```
-  choco install ffmpeg
-  ```
+The compose deployment uses:
 
-### Python Dependencies
+- `data/input`: watched recursively for audio/video
+- `data/output/<sha256>`: immutable completed bundles
+- `data/state/worker.sqlite3`: queue and retry state
+- `data/cache`: downloaded Hugging Face and Torch models
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/jfcostello/meeting-transcriber.git
-   cd meeting-transcriber
-   ```
+Supported inputs: AAC, AVI, FLAC, M4A, MKV, MOV, MP3, MP4, OGA, OGG, OPUS, WAV and WEBM. WEBM and M4A cover Logseq recordings.
 
-2. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+## Commands
 
-3. Set up your environment variables in a `.env` file:
-   ```
-   OPENAI_API_KEY=your_openai_api_key
-   ANTHROPIC_API_KEY=your_anthropic_api_key
-   GEMINI_API_KEY=your_gemini_api_key
-   REPLICATE_API_KEY=your_replicate_api_key
-   TOGETHERAI_API_KEY=your_togetherai_api_key
-   ```
+```bash
+meeting-transcriber --config config.yaml doctor
+meeting-transcriber --config config.yaml doctor --runtime
+meeting-transcriber --config config.yaml once
+meeting-transcriber --config config.yaml worker
+meeting-transcriber --config config.yaml process /path/to/recording.webm
+meeting-transcriber --config config.yaml status
+```
 
-## Usage
+`doctor` performs static checks without downloading or loading a model. `doctor --runtime` additionally requires CUDA, `HF_TOKEN`, and `WHISPER_MODEL`.
 
-1. Place your video or audio files in the `meeting_recording_queue` folder.
-2. Run the main script:
-   ```
-   python main.py
-   ```
-3. Check the output folders for transcripts and summaries.
+## Completed bundle
 
-## Configuration
+```text
+data/output/<sha256>/
+├── audio.<original-extension>
+├── job.json
+├── transcript.json
+└── transcript.md
+```
 
-The `config.yaml` file allows you to customize various aspects of the transcription and summarization process. Here's a detailed breakdown of each configuration option:
+`job.json` is the automation contract. It records the source hash, embedded or filesystem timestamp source, duration, transcription/diarization versions, summary state and eventual Logseq match.
 
-### Summary Settings
+## Privacy
 
-- `summary_type`: In the folder summary_type_presents you'll find a couple of default pre set system prompts. To choose which system prompt to use, just put the name of the .txt file here without .txt. So for meeting.txt in /summary_type_presents/ use the value "meeting". 
+- Audio and transcript processing are local.
+- No external LLM client is shipped.
+- The Hugging Face token is used only to obtain the accepted diarization model.
+- After models are cached, the deployment can be run with Hugging Face offline mode.
+- The Logseq E2EE key does not belong on the GPU PC.
 
-#### Summary Type Presets
+## Development
 
-You can create custom summary types by adding `.txt` files to the `summary_type_presets_folder`. The content of these files will be used as the system prompt for the LLM when generating summaries. There is a default meetings one there already, and a 'custom' one used for ad-hoc one off requests. There's no limit to how many you can create, and feel free to modify any that are there. Just create a .txt file and when you want to select it add it to the summary_type in config.yaml
+The lightweight tests do not load WhisperX or require a GPU:
 
-### Folder Paths
-
-- `meeting_recordings_folder`: The folder where input files are placed for processing.
-- `processed_video_folder`: The folder where processed video files are moved.
-- `processed_audio_folder`: The folder where processed audio files are moved.
-- `transcripts_folder`: The folder where generated transcripts are saved.
-- `summaries_folder`: The folder where generated summaries are saved.
-- `summary_type_presets_folder`: The folder containing summary type preset files.
-
-### Transcription Engine Settings
-
-- `transcription_engine`: The transcription engine to use. Options are "whisper" or "faster_whisper".
-
-Faster Whisper is a faster and more efficient version of Whisper, which may be more suitable for larger audio files if you don't have a GPU.
-
-#### Whisper Settings
-
-- `model`: The Whisper model to use for transcription. Options include "tiny", "base", "small", "medium", and "large".
-- `language`: The language of the audio. Set to "auto" for automatic detection or specify a language code.
-- `device`: The device to use for processing. Options are "auto", "cpu", or "cuda".
-- `batch_size`: The batch size for processing. Set to "auto" or specify an integer.
-- `use_fp16`: Whether to use FP16 precision. Options are "auto", true, or false.
-- `segment_length`: The length of audio segments to process. Set to "auto" or specify an integer (in seconds).
-
-#### Faster Whisper Settings
-
-- `model`: The Faster Whisper model to use for transcription. Options include "tiny", "base", "small", "medium", and "large".
-- `device`: The device to use for processing. Options are "auto", "cpu", or "cuda".
-- `compute_type`: The compute type for processing. Options are "float16", "int8_float16", or "int8".
-- `beam_size`: The beam size for transcription.
-
-### LLM Settings
-
-The LLM (Large Language Model) settings control how the summarization process works. These settings are crucial for determining which AI model will generate the summary and how it will behave.
-
-- `model`: The name of the LLM model to use for summarization.
-  - For OpenAI: e.g., "gpt-3.5-turbo", "gpt-4"
-  - For Anthropic: e.g., "claude-3-5-sonnet-20240620", "claude-3-haiku-20240307"
-  - For Google: e.g., "gemini-pro"
-  - For Replicate: Specify the full model string, e.g., "mistralai/mixtral-8x7b-instruct-v0.1"
-  - For Together AI: e.g., "mistralai/Mixtral-8x7B-Instruct-v0.1"
-  - For local models (e.g., with LM Studio): Use the model name specified in your local setup
-
-- `client_type`: The type of LLM client to use. Options include:
-  - "openai": For OpenAI's API
-  - "anthropic": For Anthropic's API
-  - "gemini": For Google's Gemini API
-  - "replicate": For Replicate's API
-  - "togetherai": For Together AI's API
-  - "local_openai": For local models using the OpenAI-compatible API (e.g., LM Studio)
-
-- `max_tokens`: The maximum number of tokens for the LLM response.
-  - This limits the length of the generated summary.
-  - Adjust based on your desired summary length and model capabilities.
-  - Typical values range from 500 to 4000, depending on the model and use case.
-
-- `temperature`: The temperature setting for the LLM (controls randomness).
-  - Range is typically 0 to 1.
-  - Lower values (e.g., 0.2) produce more focused, deterministic outputs.
-  - Higher values (e.g., 0.8) produce more diverse, creative outputs.
-  - For summarization, a lower temperature (0.2 - 0.5) is often preferred.
-
-- `base_url`: (Optional) The base URL for the API endpoint.
-  - Required when using `local_openai` client type or non-standard API endpoints.
-  - For LM Studio, this would typically be "http://localhost:1234/v1" (adjust port as needed).
-
-#### Using LM Studio with the Local OpenAI Approach
-
-To use a local model with LM Studio:
-
-1. Install and set up LM Studio on your machine.
-
-2. In LM Studio, load your desired local model and start the local server.
-
-3. In your `config.yaml`, set the following:
-
-   ```yaml
-   llm:
-     model: "your-local-model-name"
-     client_type: "local_openai"
-     max_tokens: 2000
-     temperature: 0.3
-     base_url: "http://localhost:1234/v1"
-   ```
-
-   Replace "your-local-model-name" with the name of the model you're using in LM Studio, and adjust the port in `base_url` if necessary.
-
-4. In your `.env` file, add:
-
-   ```
-   LOCAL_LLM_API_KEY=lm_studio
-   ```
-
-   LM Studio doesn't require an API key and uses this as a default
-
-5. Run your script as usual. It will now use your local model through LM Studio for summarization.
-
-#### Example Configurations
-
-1. Using OpenAI's GPT-3.5:
-   ```yaml
-   llm:
-     model: "gpt-3.5-turbo"
-     client_type: "openai"
-     max_tokens: 1000
-     temperature: 0.3
-   ```
-
-2. Using Anthropic's Claude:
-   ```yaml
-   llm:
-     model: "claude-3-5-sonnet-20240620"
-     client_type: "anthropic"
-     max_tokens: 2000
-     temperature: 0.2
-   ```
-
-3. Using a local model with LM Studio:
-   ```yaml
-   llm:
-     model: "llama-2-7b-chat"
-     client_type: "local_openai"
-     max_tokens: 1500
-     temperature: 0.4
-     base_url: "http://localhost:1234/v1"
-   ```
-
-Remember to ensure that you have the necessary API keys set in your `.env` file for the chosen `client_type`, except for `local_openai` which doesn't require an API key.
-
-## Supported File Types
-
-- Video: .mp4, .avi, .mov, .mkv
-- Audio: .mp3, .wav, .m4a, .flac
-
-## Troubleshooting
-
-- If you encounter CUDA-related issues, ensure that your PyTorch installation matches your CUDA version.
-- For any API-related errors, check that your API keys are correctly set in the `.env` file.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
+```bash
+python -m pip install PyYAML pytest
+pytest
+```
