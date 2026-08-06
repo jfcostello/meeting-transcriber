@@ -34,10 +34,9 @@ COPY main.py config.yaml config.container.yaml ./
 
 RUN python3 -m pip install --break-system-packages --no-deps .
 
-RUN useradd --create-home --uid 1000 worker \
-    && mkdir -p /data/input /data/output /data/state /cache \
-    && chown -R worker:worker /data /cache
+RUN mkdir -p /data/input /data/output /data/state /cache \
+    && chown -R 1000:1000 /data /cache
 
-USER worker
+USER 1000:1000
 ENTRYPOINT ["meeting-transcriber", "--config", "/app/config.yaml"]
 CMD ["worker"]
