@@ -36,7 +36,9 @@ class StateStore:
               size INTEGER NOT NULL,
               mtime_ns INTEGER NOT NULL,
               stable_since REAL NOT NULL,
-              last_seen REAL NOT NULL
+              last_seen REAL NOT NULL,
+              submitted_size INTEGER,
+              submitted_mtime_ns INTEGER
             );
             CREATE TABLE IF NOT EXISTS jobs (
               job_id TEXT PRIMARY KEY,
@@ -58,6 +60,18 @@ class StateStore:
             CREATE INDEX IF NOT EXISTS jobs_ready_idx ON jobs(status, next_attempt_at, created_at);
             """
         )
+        observation_columns = {
+            row["name"]
+            for row in self.connection.execute("PRAGMA table_info(observations)")
+        }
+        if "submitted_size" not in observation_columns:
+            self.connection.execute(
+                "ALTER TABLE observations ADD COLUMN submitted_size INTEGER"
+            )
+        if "submitted_mtime_ns" not in observation_columns:
+            self.connection.execute(
+                "ALTER TABLE observations ADD COLUMN submitted_mtime_ns INTEGER"
+            )
         self.connection.execute(
             "UPDATE jobs SET status='queued', next_attempt_at=0, error='worker interrupted' WHERE status='processing'"
         )
@@ -84,6 +98,11 @@ class StateStore:
         self.connection.execute(
             "UPDATE observations SET last_seen=? WHERE path=?", (now, str(path))
         )
+        if (
+            row["submitted_size"] == stat.st_size
+            and row["submitted_mtime_ns"] == stat.st_mtime_ns
+        ):
+            return False
         return now - row["stable_since"] >= stable_seconds
 
     def enqueue(
@@ -103,6 +122,10 @@ class StateStore:
             "INSERT INTO sources(path,job_id,discovered_at) VALUES(?,?,?) "
             "ON CONFLICT(path) DO UPDATE SET job_id=excluded.job_id,discovered_at=excluded.discovered_at",
             (str(source), job_id, now),
+        )
+        self.connection.execute(
+            "UPDATE observations SET submitted_size=size,submitted_mtime_ns=mtime_ns WHERE path=?",
+            (str(source),),
         )
         return cursor.rowcount == 1
 

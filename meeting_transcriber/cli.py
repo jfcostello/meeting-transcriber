@@ -8,6 +8,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from .benchmark import benchmark_models
 from .config import AppConfig, ConfigError, load_config
 from .media import probe_media, sha256_file
 from .pipeline import process_job
@@ -26,6 +27,19 @@ def _parser() -> argparse.ArgumentParser:
     subparsers.add_parser("once", help="run one discovery and processing cycle")
     process = subparsers.add_parser("process", help="process one file immediately")
     process.add_argument("path")
+    benchmark = subparsers.add_parser(
+        "benchmark", help="compare full diarized results from multiple ASR models"
+    )
+    benchmark.add_argument("path")
+    benchmark.add_argument(
+        "--model",
+        action="append",
+        required=True,
+        help="model name or local model path; repeat to compare models",
+    )
+    benchmark.add_argument(
+        "--output", help="benchmark directory; defaults under the state directory"
+    )
     doctor = subparsers.add_parser(
         "doctor", help="validate configuration and dependencies"
     )
@@ -98,6 +112,20 @@ def run(argv: list[str] | None = None) -> int:
             metadata = probe_media(source, config.timezone).to_dict()
             output = process_job(Job(digest, str(source), metadata, 1), config)
             print(json.dumps({"job_id": digest, "output": str(output)}, indent=2))
+            return 0
+        if args.command == "benchmark":
+            output_dir, report = benchmark_models(
+                Path(args.path),
+                config,
+                args.model,
+                Path(args.output).expanduser().resolve() if args.output else None,
+            )
+            print(
+                json.dumps(
+                    {"output": str(output_dir), "results": report["results"]},
+                    indent=2,
+                )
+            )
             return 0
         if args.command == "status":
             config.paths.state.mkdir(parents=True, exist_ok=True)

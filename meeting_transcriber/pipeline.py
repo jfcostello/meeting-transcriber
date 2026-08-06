@@ -98,6 +98,8 @@ def process_job(
             "language": transcription["language"],
             "diarization_model": transcription["diarization_model"],
             "speakers": transcription["speakers"],
+            "effective_batch_size": transcription.get("effective_batch_size"),
+            "timings_seconds": transcription.get("timings_seconds", {}),
             "transcript_json": "transcript.json",
             "transcript_markdown": "transcript.md",
         },

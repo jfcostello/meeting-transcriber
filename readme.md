@@ -28,6 +28,25 @@ docker compose -f compose.gpu.yaml up -d
 
 The model is intentionally unset. The worker will refuse to process audio until `WHISPER_MODEL` is explicitly selected.
 
+## Model selection
+
+Do not select a model from generic benchmarks. Run the same representative private meeting through the current shortlist:
+
+```bash
+docker compose -f compose.gpu.yaml run --rm transcriber benchmark /data/input/example.webm \
+  --model distil-whisper/distil-large-v3.5-ct2 \
+  --model large-v3-turbo \
+  --model large-v3
+```
+
+This writes a diarized transcript for each model plus stage timings and the processing-speed multiple under `data/state/benchmarks`. Compare names, specialist terms, omissions and hallucinations as well as speed.
+
+- `distil-large-v3.5` is the newest fast English candidate.
+- `large-v3-turbo` is the leading multilingual and long-form candidate.
+- `large-v3` is the slower accuracy baseline.
+
+The worker automatically halves the configured batch size and retries if the 8 GB GPU runs out of memory. The successful batch size and every processing-stage duration are recorded in `job.json`.
+
 ## Paths
 
 The compose deployment uses:
@@ -69,7 +88,8 @@ data/output/<sha256>/
 - Audio and transcript processing are local.
 - No external LLM client is shipped.
 - The Hugging Face token is used only to obtain the accepted diarization model.
-- After models are cached, the deployment can be run with Hugging Face offline mode.
+- Hugging Face and pyannote telemetry are forcibly disabled.
+- After models are cached, run with `docker compose -f compose.gpu.yaml -f compose.offline.yaml up -d` to remove network access from the worker completely.
 - The Logseq E2EE key does not belong on the GPU PC.
 
 ## Development

@@ -1,3 +1,5 @@
+import sqlite3
+
 from meeting_transcriber.state import StateStore
 
 
@@ -9,8 +11,11 @@ def test_file_must_remain_stable(tmp_path):
         assert not state.observe(source, stable_seconds=10, now=100)
         assert not state.observe(source, stable_seconds=10, now=109)
         assert state.observe(source, stable_seconds=10, now=110)
+        assert state.enqueue(source, "first-hash", {}, now=110)
+        assert not state.observe(source, stable_seconds=10, now=120)
         source.write_bytes(b"changed")
-        assert not state.observe(source, stable_seconds=10, now=111)
+        assert not state.observe(source, stable_seconds=10, now=121)
+        assert state.observe(source, stable_seconds=10, now=131)
     finally:
         state.close()
 
@@ -32,5 +37,25 @@ def test_hash_deduplication_and_retry(tmp_path):
         assert retry is not None and retry.attempts == 2
         state.complete(retry.job_id, tmp_path / "output", now=15)
         assert state.stats()["complete"] == 1
+    finally:
+        state.close()
+
+
+def test_existing_observation_database_is_migrated(tmp_path):
+    database = tmp_path / "old.sqlite3"
+    connection = sqlite3.connect(database)
+    connection.execute(
+        "CREATE TABLE observations(path TEXT PRIMARY KEY,size INTEGER NOT NULL,mtime_ns INTEGER NOT NULL,stable_since REAL NOT NULL,last_seen REAL NOT NULL)"
+    )
+    connection.commit()
+    connection.close()
+
+    state = StateStore(database)
+    try:
+        columns = {
+            row["name"]
+            for row in state.connection.execute("PRAGMA table_info(observations)")
+        }
+        assert {"submitted_size", "submitted_mtime_ns"} <= columns
     finally:
         state.close()
