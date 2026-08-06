@@ -43,10 +43,20 @@ class WorkerConfig:
 
 @dataclass(frozen=True)
 class TranscriptionConfig:
+    backend: str
     model: str
     device: str
+    device_index: int
     compute_type: str
+    parakeet_dtype: str
+    parakeet_chunk_seconds: int
+    parakeet_overlap_seconds: int
     batch_size: int
+    beam_size: int
+    chunk_size_seconds: int
+    vad_method: str
+    cpu_threads: int
+    allow_tf32: bool
     language: str | None
     min_speakers: int | None
     max_speakers: int | None
@@ -72,7 +82,7 @@ class AppConfig:
 
     def validate_runtime(self) -> None:
         if not self.transcription.model:
-            raise ConfigError("WHISPER_MODEL is not configured")
+            raise ConfigError("TRANSCRIPTION_MODEL is not configured")
         token = os.getenv(self.transcription.hf_token_env, "")
         if not token:
             raise ConfigError(
@@ -103,6 +113,20 @@ def _optional_int(value: Any, name: str) -> int | None:
     if parsed < 1:
         raise ConfigError(f"{name} must be positive")
     return parsed
+
+
+def _boolean(value: Any, name: str) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int) and value in {0, 1}:
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "yes", "on", "1"}:
+            return True
+        if normalized in {"false", "no", "off", "0"}:
+            return False
+    raise ConfigError(f"{name} must be true or false")
 
 
 def load_config(path: str | Path) -> AppConfig:
@@ -146,10 +170,26 @@ def load_config(path: str | Path) -> AppConfig:
     if min_speakers and max_speakers and min_speakers > max_speakers:
         raise ConfigError("min_speakers cannot exceed max_speakers")
     transcription = TranscriptionConfig(
+        backend=str(transcription_raw.get("backend", "whisperx")).strip().lower(),
         model=str(transcription_raw.get("model", "")).strip(),
         device=str(transcription_raw.get("device", "cuda")).strip(),
+        device_index=max(0, int(transcription_raw.get("device_index", 0))),
         compute_type=str(transcription_raw.get("compute_type", "int8_float16")).strip(),
+        parakeet_dtype=str(transcription_raw.get("parakeet_dtype", "float16")).strip(),
+        parakeet_chunk_seconds=max(
+            60, int(transcription_raw.get("parakeet_chunk_seconds", 300))
+        ),
+        parakeet_overlap_seconds=max(
+            0, int(transcription_raw.get("parakeet_overlap_seconds", 2))
+        ),
         batch_size=max(1, int(transcription_raw.get("batch_size", 8))),
+        beam_size=max(1, int(transcription_raw.get("beam_size", 1))),
+        chunk_size_seconds=max(5, int(transcription_raw.get("chunk_size_seconds", 30))),
+        vad_method=str(transcription_raw.get("vad_method", "silero")).strip(),
+        cpu_threads=max(1, int(transcription_raw.get("cpu_threads", 4))),
+        allow_tf32=_boolean(
+            transcription_raw.get("allow_tf32", True), "transcription.allow_tf32"
+        ),
         language=(
             str(transcription_raw["language"]).strip()
             if transcription_raw.get("language")
@@ -164,11 +204,22 @@ def load_config(path: str | Path) -> AppConfig:
         ).strip(),
         hf_token_env=str(transcription_raw.get("hf_token_env", "HF_TOKEN")).strip(),
     )
+    if transcription.backend not in {"whisperx", "parakeet"}:
+        raise ConfigError("transcription.backend must be whisperx or parakeet")
+    if transcription.vad_method not in {"silero", "pyannote"}:
+        raise ConfigError("transcription.vad_method must be silero or pyannote")
+    if transcription.parakeet_dtype not in {"float16", "float32"}:
+        raise ConfigError("transcription.parakeet_dtype must be float16 or float32")
+    if (
+        transcription.parakeet_overlap_seconds * 2
+        >= transcription.parakeet_chunk_seconds
+    ):
+        raise ConfigError("parakeet overlap must be less than half the chunk size")
     if not transcription.diarization_model:
         raise ConfigError("a diarization model is required")
 
     summary = SummaryConfig(
-        enabled=bool(summary_raw.get("enabled", False)),
+        enabled=_boolean(summary_raw.get("enabled", False), "summary.enabled"),
         provider=str(summary_raw.get("provider", "openai_compatible")).strip(),
         base_url=(
             str(summary_raw["base_url"]).rstrip("/")

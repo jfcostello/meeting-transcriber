@@ -8,7 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive \
     TORCH_HOME=/cache/torch \
     HF_HUB_DISABLE_TELEMETRY=1 \
     DO_NOT_TRACK=1 \
-    PYANNOTE_METRICS_ENABLED=0
+    PYANNOTE_METRICS_ENABLED=0 \
+    TOKENIZERS_PARALLELISM=false \
+    CUDA_MODULE_LOADING=LAZY \
+    CT2_CUDA_ALLOCATOR=cuda_malloc_async \
+    PYTORCH_ALLOC_CONF=expandable_segments:True,garbage_collection_threshold:0.8
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg git python3 python3-pip python3-venv \
@@ -22,6 +26,7 @@ RUN python3 -m pip install --break-system-packages \
       torch==2.8.0 torchaudio==2.8.0 torchvision==0.23.0 \
     && python3 -m pip install --break-system-packages \
       "PyYAML>=6.0.2,<7" \
+      "transformers==5.14.1" \
       "whisperx @ git+https://github.com/m-bain/whisperX.git@2cfd7b7c5c7bba144954364db747319b50e8232b"
 
 COPY meeting_transcriber ./meeting_transcriber

@@ -4,6 +4,7 @@ import logging
 import time
 
 from .config import AppConfig
+from .engines import create_engine
 from .media import is_supported, probe_media, sha256_file
 from .pipeline import process_job
 from .state import StateStore
@@ -18,6 +19,7 @@ class Worker:
         self.config.paths.output.mkdir(parents=True, exist_ok=True)
         self.config.paths.state.mkdir(parents=True, exist_ok=True)
         self.state = StateStore(self.config.paths.state / "worker.sqlite3")
+        self.engine = create_engine(self.config.transcription)
 
     def close(self) -> None:
         self.state.close()
@@ -43,7 +45,7 @@ class Worker:
         processed = 0
         while job := self.state.claim():
             try:
-                output = process_job(job, self.config)
+                output = process_job(job, self.config, self.engine)
                 self.state.complete(job.job_id, output)
                 LOGGER.info("completed %s", job.job_id)
                 processed += 1

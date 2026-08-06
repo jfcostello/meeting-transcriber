@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Any
 
 from .config import AppConfig
+from .engines import TranscriptionEngine, create_engine
 from .render import transcript_markdown
 from .state import Job
 from .summarizer import LocalOpenAISummarizer
-from .whisperx_engine import WhisperXEngine
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
@@ -21,7 +21,7 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 def process_job(
-    job: Job, config: AppConfig, engine: WhisperXEngine | None = None
+    job: Job, config: AppConfig, engine: TranscriptionEngine | None = None
 ) -> Path:
     source = Path(job.source_path)
     if not source.is_file():
@@ -43,7 +43,7 @@ def process_job(
     audio_name = f"audio{source.suffix.lower()}"
     shutil.copy2(source, temporary / audio_name)
 
-    transcription = (engine or WhisperXEngine(config.transcription)).transcribe(source)
+    transcription = (engine or create_engine(config.transcription)).transcribe(source)
     transcript_data = {
         "schema_version": 1,
         "job_id": job.job_id,
@@ -94,11 +94,13 @@ def process_job(
         "audio": {"path": audio_name},
         "transcription": {
             "engine": transcription["engine"],
+            "backend": transcription.get("backend", config.transcription.backend),
             "model": transcription["model"],
             "language": transcription["language"],
             "diarization_model": transcription["diarization_model"],
             "speakers": transcription["speakers"],
             "effective_batch_size": transcription.get("effective_batch_size"),
+            "effective_chunk_seconds": transcription.get("effective_chunk_seconds"),
             "timings_seconds": transcription.get("timings_seconds", {}),
             "transcript_json": "transcript.json",
             "transcript_markdown": "transcript.md",

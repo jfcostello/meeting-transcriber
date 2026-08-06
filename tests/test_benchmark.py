@@ -2,7 +2,11 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from meeting_transcriber.benchmark import benchmark_models
+from meeting_transcriber.benchmark import (
+    RTX_3070_CANDIDATES,
+    benchmark_models,
+    parse_candidate,
+)
 from meeting_transcriber.config import load_config
 
 
@@ -68,3 +72,15 @@ transcription:
     for result in report["results"]:
         transcript = output / result["directory"] / "transcript.md"
         assert result["model"] in transcript.read_text(encoding="utf-8")
+
+
+def test_mixed_backend_candidates_and_3070_preset_are_explicit():
+    parakeet = parse_candidate("parakeet=nvidia/parakeet-tdt-0.6b-v3")
+    whisper = parse_candidate("large-v3-turbo")
+    assert parakeet.backend == "parakeet"
+    assert whisper.backend == "whisperx"
+    assert {candidate.backend for candidate in RTX_3070_CANDIDATES} == {
+        "parakeet",
+        "whisperx",
+    }
+    assert all(candidate.beam_size in {None, 1} for candidate in RTX_3070_CANDIDATES)

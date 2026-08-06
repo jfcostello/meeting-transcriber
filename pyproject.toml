@@ -4,18 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "meeting-transcriber"
-version = "2.0.0"
-description = "Private, queued WhisperX meeting transcription with mandatory diarization"
+version = "2.1.0"
+description = "Private queued WhisperX or Parakeet transcription with mandatory diarization"
 readme = "readme.md"
 requires-python = ">=3.10,<3.14"
 license = {text = "MIT"}
 dependencies = [
   "PyYAML>=6.0.2,<7",
+  "transformers==5.14.1",
   "whisperx @ git+https://github.com/m-bain/whisperX.git@2cfd7b7c5c7bba144954364db747319b50e8232b",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.3,<9"]
+dev = ["pytest>=8.3,<9", "ruff>=0.12,<1"]
 
 [project.scripts]
 meeting-transcriber = "meeting_transcriber.cli:main"
@@ -26,4 +27,3 @@ include = ["meeting_transcriber*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-

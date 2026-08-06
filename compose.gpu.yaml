@@ -1,6 +1,7 @@
 services:
   transcriber:
     build: .
+    init: true
     restart: unless-stopped
     gpus: all
     env_file:
@@ -15,3 +16,5 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    environment:
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility

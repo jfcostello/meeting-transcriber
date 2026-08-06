@@ -11,12 +11,22 @@ worker:
   retry_delays_seconds: [60, 300, 1800, 7200]
 
 transcription:
+  backend: ${TRANSCRIPTION_BACKEND}
   # Deliberately unset until the GPU PC is prepared.
-  model: ${WHISPER_MODEL}
+  model: ${TRANSCRIPTION_MODEL}
   device: cuda
+  device_index: 0
   compute_type: int8_float16
+  parakeet_dtype: float16
+  parakeet_chunk_seconds: 300
+  parakeet_overlap_seconds: 2
   batch_size: 8
-  language:
+  beam_size: 1
+  chunk_size_seconds: 30
+  vad_method: silero
+  cpu_threads: 4
+  allow_tf32: true
+  language: en
   min_speakers:
   max_speakers:
   diarization_model: pyannote/speaker-diarization-community-1
