@@ -29,6 +29,11 @@ RUN python3 -m pip install --break-system-packages \
       "transformers==5.14.1" \
       "whisperx @ git+https://github.com/m-bain/whisperX.git@2cfd7b7c5c7bba144954364db747319b50e8232b"
 
+# TorchCodec dynamically links the shared CPython runtime when pyannote imports.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpython3.12t64 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY meeting_transcriber ./meeting_transcriber
 COPY main.py config.yaml config.container.yaml ./
 
